@@ -1,0 +1,16 @@
+{
+  "_comment": "TEMPLATE for Al-Asbahani 'an Warsh. Copy to asbahani.json and point at real files. See docs/ADDING_RIWAYA.md.",
+  "edition_id": "asbahani",
+  "display_name": "Al-Asbahani 'an Warsh (custom mushaf)",
+  "words_file": "asbahani_mushaf/app_asbahani_words.json",
+  "numbering_map_file": "asbahani_mushaf/numbering_map.json",
+  "app_pages_file": "asbahani_mushaf/app_pages.json",
+  "normalize": {
+    "strip_tatweel": true,
+    "alef_variants": true,
+    "hamza_variants": true,
+    "maqsurah_to_ya": true,
+    "yeh_variants": true
+  },
+  "min_confidence": 0.6
+}

@@ -1,0 +1,15 @@
+{
+  "edition_id": "hafs",
+  "display_name": "Hafs 'an 'Asim (custom mushaf)",
+  "words_file": "editions/hafs/app_words.json",
+  "numbering_map_file": "editions/hafs/numbering_map.json",
+  "app_pages_file": "editions/hafs/app_pages.json",
+  "normalize": {
+    "strip_tatweel": true,
+    "alef_variants": true,
+    "hamza_variants": true,
+    "maqsurah_to_ya": true,
+    "yeh_variants": true
+  },
+  "min_confidence": 0.6
+}

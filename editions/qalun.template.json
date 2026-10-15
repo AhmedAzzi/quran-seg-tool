@@ -1,0 +1,16 @@
+{
+  "_comment": "TEMPLATE for Qalun 'an Nafi'. Copy to qalun.json and point at real files. See docs/ADDING_RIWAYA.md.",
+  "edition_id": "qalun",
+  "display_name": "Qalun 'an Nafi' (custom mushaf)",
+  "words_file": "qalun_mushaf/app_qalun_words.json",
+  "numbering_map_file": "qalun_mushaf/numbering_map.json",
+  "app_pages_file": "qalun_mushaf/app_pages.json",
+  "normalize": {
+    "strip_tatweel": true,
+    "alef_variants": true,
+    "hamza_variants": true,
+    "maqsurah_to_ya": true,
+    "yeh_variants": true
+  },
+  "min_confidence": 0.6
+}

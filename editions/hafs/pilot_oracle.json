@@ -1,0 +1,1119 @@
+{
+  "1": {
+    "align": "ok",
+    "page_ok": true,
+    "groups": [
+      {
+        "ayahs": [
+          [
+            1,
+            1
+          ]
+        ],
+        "n": 4,
+        "exp": 4,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          408
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            1,
+            2
+          ]
+        ],
+        "n": 4,
+        "exp": 4,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          520
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            1,
+            3
+          ]
+        ],
+        "n": 2,
+        "exp": 2,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          520,
+          625
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            1,
+            4
+          ]
+        ],
+        "n": 3,
+        "exp": 3,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          625
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            1,
+            5
+          ]
+        ],
+        "n": 4,
+        "exp": 4,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          744
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            1,
+            6
+          ]
+        ],
+        "n": 3,
+        "exp": 3,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          850
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            1,
+            7
+          ]
+        ],
+        "n": 9,
+        "exp": 9,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          850,
+          952,
+          1059
+        ]
+      }
+    ],
+    "skipped": [],
+    "tokens": 29,
+    "markers": 7,
+    "bismillah": 0,
+    "flagged": 3,
+    "actions": [
+      [
+        "dtw-merge",
+        512,
+        644
+      ],
+      [
+        "dtw-merge",
+        726,
+        835
+      ],
+      [
+        "split",
+        354,
+        809,
+        778,
+        "valley"
+      ],
+      [
+        "split",
+        354,
+        778,
+        733,
+        "valley"
+      ],
+      [
+        "split",
+        354,
+        733,
+        666,
+        "valley"
+      ],
+      [
+        "dtw-split",
+        354,
+        666
+      ],
+      [
+        "dtw-merge",
+        733,
+        809
+      ]
+    ],
+    "wide_edge_drops": [],
+    "stem": "1",
+    "pkey": "001",
+    "n_tokens": 36
+  },
+  "2": {
+    "align": "ok",
+    "page_ok": false,
+    "groups": [
+      {
+        "ayahs": [
+          [
+            2,
+            1
+          ]
+        ],
+        "n": 2,
+        "exp": 2,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          414,
+          532
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            2
+          ]
+        ],
+        "n": 7,
+        "exp": 7,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          532,
+          635
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        "n": 20,
+        "exp": 20,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [
+          [
+            2,
+            3
+          ]
+        ],
+        "y": [
+          635,
+          752,
+          852,
+          968
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            5
+          ]
+        ],
+        "n": 8,
+        "exp": 8,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          968,
+          1069
+        ]
+      }
+    ],
+    "skipped": [
+      [
+        2,
+        3
+      ]
+    ],
+    "tokens": 36,
+    "markers": 4,
+    "bismillah": 1,
+    "flagged": 2,
+    "actions": [
+      [
+        "carve",
+        640,
+        827,
+        532,
+        [
+          [
+            640,
+            706,
+            "word"
+          ],
+          [
+            706,
+            771,
+            "marker"
+          ],
+          [
+            771,
+            827,
+            "word"
+          ]
+        ],
+        "gold"
+      ],
+      [
+        "carve",
+        474,
+        725,
+        635,
+        [
+          [
+            474,
+            661,
+            "word"
+          ],
+          [
+            661,
+            724,
+            "marker"
+          ]
+        ],
+        "gold"
+      ],
+      [
+        "carve",
+        283,
+        449,
+        968,
+        [
+          [
+            283,
+            384,
+            "word"
+          ],
+          [
+            384,
+            446,
+            "marker"
+          ]
+        ],
+        "gold"
+      ],
+      [
+        "carve",
+        233,
+        482,
+        1069,
+        [
+          [
+            233,
+            300,
+            "marker"
+          ],
+          [
+            300,
+            482,
+            "word"
+          ]
+        ],
+        "gold"
+      ],
+      [
+        "split",
+        340,
+        519,
+        418,
+        "gap"
+      ],
+      [
+        "split",
+        519,
+        640,
+        550,
+        "valley"
+      ],
+      [
+        "split",
+        474,
+        661,
+        580,
+        "gap"
+      ],
+      [
+        "split",
+        300,
+        475,
+        376,
+        "valley"
+      ],
+      [
+        "split",
+        605,
+        749,
+        697,
+        "gap"
+      ],
+      [
+        "split",
+        482,
+        692,
+        606,
+        "gap"
+      ],
+      [
+        "split",
+        300,
+        482,
+        436,
+        "gap"
+      ],
+      [
+        "dtw-merge",
+        605,
+        749
+      ],
+      [
+        "dtw-split",
+        283,
+        413
+      ],
+      [
+        "edge-shave-rescue"
+      ]
+    ],
+    "wide_edge_drops": [],
+    "stem": "2",
+    "pkey": "002",
+    "n_tokens": 41
+  },
+  "20": {
+    "align": "ok",
+    "page_ok": true,
+    "groups": [
+      {
+        "ayahs": [
+          [
+            2,
+            127
+          ]
+        ],
+        "n": 14,
+        "exp": 14,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          42,
+          148
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            128
+          ]
+        ],
+        "n": 17,
+        "exp": 17,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          148,
+          245,
+          347
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            129
+          ]
+        ],
+        "n": 16,
+        "exp": 16,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          347,
+          449,
+          550
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            130
+          ]
+        ],
+        "n": 18,
+        "exp": 18,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          550,
+          639,
+          748
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            131
+          ]
+        ],
+        "n": 9,
+        "exp": 9,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          748,
+          853
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            132
+          ]
+        ],
+        "n": 16,
+        "exp": 16,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          853,
+          952,
+          1052
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            133
+          ]
+        ],
+        "n": 27,
+        "exp": 27,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          1052,
+          1152,
+          1261,
+          1352
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            134
+          ]
+        ],
+        "n": 15,
+        "exp": 15,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          1352,
+          1455
+        ]
+      }
+    ],
+    "skipped": [],
+    "tokens": 132,
+    "markers": 8,
+    "bismillah": 0,
+    "flagged": 9,
+    "actions": [
+      [
+        "carve",
+        488,
+        718,
+        347,
+        [
+          [
+            488,
+            560,
+            "marker"
+          ],
+          [
+            560,
+            718,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "carve",
+        263,
+        549,
+        550,
+        [
+          [
+            263,
+            343,
+            "word"
+          ],
+          [
+            343,
+            413,
+            "marker"
+          ],
+          [
+            413,
+            549,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "carve",
+        31,
+        220,
+        1455,
+        [
+          [
+            31,
+            105,
+            "marker"
+          ],
+          [
+            105,
+            220,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "dtw-merge",
+        269,
+        425
+      ],
+      [
+        "dtw-split",
+        712,
+        901
+      ],
+      [
+        "dtw-split",
+        893,
+        1049
+      ],
+      [
+        "dtw-split",
+        798,
+        1049
+      ],
+      [
+        "dtw-split",
+        55,
+        316
+      ],
+      [
+        "dtw-merge",
+        29,
+        101
+      ],
+      [
+        "dtw-split",
+        502,
+        722
+      ],
+      [
+        "dtw-split",
+        117,
+        455
+      ],
+      [
+        "dtw-split",
+        501,
+        804
+      ],
+      [
+        "dtw-split",
+        587,
+        778
+      ]
+    ],
+    "wide_edge_drops": [],
+    "stem": "20",
+    "pkey": "020",
+    "n_tokens": 140
+  },
+  "3": {
+    "align": "ok",
+    "page_ok": true,
+    "groups": [
+      {
+        "ayahs": [
+          [
+            2,
+            6
+          ]
+        ],
+        "n": 11,
+        "exp": 11,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          41,
+          145
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            7
+          ]
+        ],
+        "n": 12,
+        "exp": 12,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          145,
+          244
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            8
+          ]
+        ],
+        "n": 11,
+        "exp": 11,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          244,
+          344
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            9
+          ]
+        ],
+        "n": 10,
+        "exp": 10,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          444,
+          550
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "n": 12,
+        "exp": 12,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          550,
+          645
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            11
+          ]
+        ],
+        "n": 11,
+        "exp": 11,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          645,
+          752
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            12
+          ]
+        ],
+        "n": 7,
+        "exp": 7,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          848
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            13
+          ]
+        ],
+        "n": 19,
+        "exp": 19,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          848,
+          952,
+          1052
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            14
+          ]
+        ],
+        "n": 16,
+        "exp": 16,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          1052,
+          1152,
+          1260
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            15
+          ]
+        ],
+        "n": 7,
+        "exp": 7,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          1260,
+          1353
+        ]
+      },
+      {
+        "ayahs": [
+          [
+            2,
+            16
+          ]
+        ],
+        "n": 11,
+        "exp": 11,
+        "ok": true,
+        "fail": null,
+        "edge": false,
+        "skipped": [],
+        "y": [
+          1353,
+          1460
+        ]
+      }
+    ],
+    "skipped": [],
+    "tokens": 127,
+    "markers": 11,
+    "bismillah": 0,
+    "flagged": 15,
+    "actions": [
+      [
+        "carve",
+        806,
+        1051,
+        145,
+        [
+          [
+            806,
+            876,
+            "marker"
+          ],
+          [
+            876,
+            1051,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "carve",
+        227,
+        431,
+        244,
+        [
+          [
+            227,
+            298,
+            "marker"
+          ],
+          [
+            298,
+            431,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "carve",
+        283,
+        419,
+        645,
+        [
+          [
+            283,
+            355,
+            "marker"
+          ],
+          [
+            355,
+            419,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "carve",
+        187,
+        405,
+        848,
+        [
+          [
+            187,
+            258,
+            "marker"
+          ],
+          [
+            258,
+            405,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "carve",
+        130,
+        501,
+        1052,
+        [
+          [
+            130,
+            226,
+            "word"
+          ],
+          [
+            226,
+            297,
+            "marker"
+          ],
+          [
+            297,
+            501,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "carve",
+        34,
+        325,
+        1460,
+        [
+          [
+            34,
+            114,
+            "marker"
+          ],
+          [
+            114,
+            325,
+            "word"
+          ]
+        ],
+        "black"
+      ],
+      [
+        "dtw-split",
+        876,
+        1051
+      ],
+      [
+        "dtw-merge",
+        431,
+        574
+      ],
+      [
+        "dtw-split",
+        403,
+        675
+      ],
+      [
+        "dtw-merge",
+        31,
+        143
+      ],
+      [
+        "dtw-merge",
+        517,
+        656
+      ],
+      [
+        "dtw-merge",
+        355,
+        524
+      ],
+      [
+        "dtw-merge",
+        796,
+        934
+      ],
+      [
+        "dtw-merge",
+        295,
+        458
+      ],
+      [
+        "dtw-split",
+        447,
+        631
+      ],
+      [
+        "dtw-merge",
+        834,
+        1001
+      ],
+      [
+        "dtw-split",
+        881,
+        1051
+      ],
+      [
+        "dtw-split",
+        297,
+        501
+      ],
+      [
+        "dtw-split",
+        881,
+        1051
+      ],
+      [
+        "dtw-split",
+        695,
+        860
+      ],
+      [
+        "dtw-split",
+        369,
+        530
+      ]
+    ],
+    "wide_edge_drops": [],
+    "stem": "3",
+    "pkey": "003",
+    "n_tokens": 138
+  }
+}

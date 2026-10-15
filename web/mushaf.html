@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mushaf — read &amp; review</title>
+<style>
+  :root { --bg:#f4f1ea; --panel:#fff; --ink:#222; --border:#ccc;
+          --accent:#0f7a4a; --gold:#b8860b; --sel:#e67700;
+          --flagged:#e2483d; --word:#2f9e44; --marker:#4263eb; --bismillah:#9c36b5;
+          --pass:#2f9e44; --fail:#e2483d; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font-family:-apple-system,Segoe UI,Roboto,sans-serif;
+         display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+  header { flex:0 0 auto; padding:12px 16px 4px; text-align:center; }
+  header h1 { font-size:1.05rem; margin:0 0 4px; }
+  header p { margin:0; font-size:.8rem; opacity:.65; }
+  .main { flex:1; min-height:0; display:flex; }
+  .sidebar { width:320px; flex:0 0 auto; overflow-y:auto; padding:8px 0 12px 12px;
+             display:flex; flex-direction:column; gap:8px; }
+  .sideblock { background:var(--panel); border:1px solid var(--border);
+               border-radius:10px; padding:10px 12px; }
+  .sideblock h2 { font-size:.85rem; margin:0 0 8px; }
+  .viewer { flex:1; min-width:0; display:flex; flex-direction:column; padding:8px 12px 12px 8px; }
+  .stage-wrap { flex:1; min-height:0; display:flex; }
+  #stage { flex:1; min-height:0; border:1px solid var(--border); border-radius:8px;
+           overflow:hidden; background:#fff;
+           display:flex; align-items:center; justify-content:center; }
+  #stage canvas { display:block; max-width:100%; max-height:100%; touch-action:manipulation; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .row label { font-size:.82rem; }
+  .nav button, .toolbar button { border:1px solid var(--border); background:var(--panel); color:var(--ink);
+    border-radius:8px; padding:8px 12px; font-size:.85rem; cursor:pointer; }
+  .nav button:disabled, .toolbar button:disabled { opacity:.4; }
+  .nav button.primary, .toolbar button.primary {
+    background:var(--accent); color:#fff; border-color:var(--accent); }
+  #btnSave { font-size:.95rem; padding:10px 12px; font-weight:700; }
+  .nav input[type=number] { width:70px; padding:7px; border:1px solid var(--border); border-radius:8px; font-size:.85rem; }
+  .nav select { padding:7px; border:1px solid var(--border); border-radius:8px; font-size:.85rem; max-width:150px; }
+  .modebtn.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+  #verdict { font-size:.85rem; font-weight:700; padding:6px 12px; border-radius:8px; }
+  #verdict.pass { color:#fff; background:var(--pass); }
+  #verdict.fail { color:#fff; background:var(--fail); }
+  #verdict.unknown { color:var(--ink); background:var(--border); }
+  .toolbar { display:flex; flex-direction:column; gap:8px; padding:0; align-items:stretch; }
+  .toolbar button { width:100%; }
+  #info { font-size:.85rem; min-height:1.4em; padding:2px 4px; flex:0 0 auto; }
+  #progress, #stats { font-size:.8rem; opacity:.75; padding:2px 0; }
+  #oraclebox { font-size:.8rem; padding-top:4px; }
+  #oraclebox .fail-line { color:var(--fail); }
+  .hint { font-size:.78rem; opacity:.6; }
+  #wordpanel .ar { font-size:2rem; line-height:2.6rem; text-align:right; }
+  #wordpanel .chip { display:inline-block; font-size:.75rem; background:var(--bg);
+    border:1px solid var(--border); border-radius:20px; padding:2px 10px; margin:6px 4px 0 0; }
+  #wordpanel .note { font-size:.8rem; background:#fff9db; border:1px solid #fcc419;
+    border-radius:8px; padding:6px 8px; margin-top:6px; }
+  .ayahtext { font-size:1rem; line-height:2rem; text-align:right; background:var(--bg);
+    border-radius:8px; padding:8px 10px; margin-top:6px; }
+  kbd { border:1px solid var(--border); border-radius:4px; padding:0 4px; font-size:.75rem; background:var(--panel); }
+  @media (max-width: 820px) {
+    body { height:auto; overflow:auto; }
+    .main { flex-direction:column; overflow:visible; }
+    .sidebar { width:auto; overflow:visible; padding:8px 12px 0 12px; }
+    .viewer { min-height:70vh; padding:8px 12px 12px 12px; }
+    #stage { min-height:60vh; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mushaf — read &amp; review</h1>
+  <p>Tap a box to select it and see the word · <b>Save ✓ Apply to app</b> saves, applies and exports in one click (needs <kbd>web/serve.bat</kbd> running)</p>
+</header>
+<div class="main">
+<aside class="sidebar">
+  <div class="sideblock">
+    <h2>Data</h2>
+    <div><span class="hint">server: <span id="srvdot">…</span></span></div>
+    <div id="loadStatus">Starting…</div>
+  </div>
+  <div class="sideblock">
+    <div class="row nav">
+      <select id="edSel" title="Mushaf edition">
+        <option value="warsh">Warsh</option>
+        <option value="hafs">Hafs</option>
+        <option value="asbahani">Asbahani</option>
+      </select>
+      <button id="btnNextUncorr" class="nav" title="Jump to next page with no recorded correction">Next new ⏭</button>
+    </div>
+    <div class="row nav" style="margin-top:8px">
+      <button id="btnPrev">◀ Prev</button>
+      <button id="btnNext">Next ▶</button>
+      <select id="pageSel" title="Jump to page"></select>
+    </div>
+    <div id="progress"></div>
+    <div class="row" id="reviewNav" style="margin-top:8px">
+      <button id="btnNextFail" class="nav" title="Jump to next oracle-FAIL page">Next FAIL ⏭</button>
+      <span id="verdict" class="unknown">no data</span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label class="hint"><input type="checkbox" id="showBoxes" checked> show boxes</label>
+    </div>
+  </div>
+  <div class="sideblock" id="readBlocks">
+    <div id="wordpanel">
+      <h2>Word</h2>
+      <div id="wordbody"></div>
+    </div>
+  </div>
+  <div class="sideblock" id="reviewBlocks">
+    <div id="stats"></div>
+    <div id="oraclebox"></div>
+    <div class="toolbar" style="margin-top:8px">
+      <button id="btnSplit" disabled>Split selected at last click</button>
+      <button id="btnMergeLeft" disabled>Merge with left neighbor</button>
+      <button id="btnToggleType" disabled>Toggle word/marker/bismillah</button>
+      <button id="btnClearFlag" disabled>Clear flag</button>
+      <button id="btnClearAllFlags">Clear all page flags</button>
+      <button id="btnDelete" disabled>Delete box</button>
+      <button id="btnAdd" class="modebtn" title="Draw a missing box: toggle on, then drag a rectangle on the page (or hold Shift and drag anytime). Shortcut: A">Add box: off</button>
+      <div class="row" style="margin-top:8px">
+        <button id="btnMapStart" title="Anchor the selected box to a word — following boxes continue sequentially">Map box…</button>
+        <button id="btnMapClear" disabled title="Drop the manual anchors (back to page-start mapping)">Clear anchor</button>
+      </div>
+      <div id="mapline" class="hint" style="margin-top:6px"></div>
+      <div id="mappick" style="display:none; margin-top:6px">
+        <select id="mapSel" style="width:100%; padding:7px; border:1px solid var(--border); border-radius:8px; font-size:.85rem"></select>
+        <div class="row" style="margin-top:6px">
+          <button id="btnMapApply" class="primary">Apply Box 0 → word</button>
+        </div>
+        <div id="mappreview" class="hint" style="margin-top:6px"></div>
+      </div>
+      <button id="btnSave" class="primary" title="One click: save boxes, rebuild verdicts and patch the Flutter app's bundled assets (needs serve.py running)">Save ✓ Apply to app</button>
+    </div>
+    <p class="hint">Tap a box to select · tap again inside it to set a split point · drag a rectangle to add a missing box (toggle <b>Add box</b> or hold <kbd>Shift</kbd>) · <kbd>◀</kbd><kbd>▶</kbd> change page.</p>
+  </div>
+</aside>
+<section class="viewer">
+  <div id="info"></div>
+  <div class="stage-wrap"><div id="stage"><canvas id="canvas"></canvas></div></div>
+</section>
+</div>
+
+<script>
+"use strict";
+// ============================== state ==============================
+const EDITIONS = ['warsh', 'hafs', 'asbahani'];
+let ED = 'warsh';
+try {
+  const e = localStorage.getItem('mushaf-edition');
+  if (EDITIONS.includes(e)) ED = e;
+} catch (err) {}
+const NS = k => k + ':' + ED; // per-edition persisted state
+let pages = [];                  // [{num, readTok, revTok, dirty}]
+let pageIdx = -1;
+let tokens = [];
+let img = new Image();
+let scale = 1, selectedIdx = null, lastClickX = null;
+let addMode = false, addDraft = null, dragStart = null, suppressClick = false;
+let oracle = null;               // <ed>/oracle.js
+let corrected = {}; // {pageNum: {at, boxes}} — Save stamps these = a correction was made
+function loadCorrected() {
+  try { corrected = JSON.parse(localStorage.getItem(NS('mushaf-corrected-v1')) || '{}'); } catch (e) { corrected = {}; }
+}
+function stampCorrected(plist) {
+  const at = new Date().toISOString();
+  for (const p of plist) corrected[p.num] = { at, boxes: (p.revTok || []).length };
+  try { localStorage.setItem(NS('mushaf-corrected-v1'), JSON.stringify(corrected)); } catch (e) {}
+  markPageOptions(); updateProgress();
+}
+function correctedCount() { return pages.filter(p => corrected[p.num]).length; }
+loadCorrected();
+
+const $ = id => document.getElementById(id);
+const canvas = $('canvas'), ctx = canvas.getContext('2d');
+const info = $('info'), stats = $('stats'), progress = $('progress');
+const loadStatus = $('loadStatus');
+const wordbody = $('wordbody');
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function save(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+// ============================== fixed paths, no picking ==============================
+// mushaf.html lives in web/ : one data bundle per edition under web/<ed>/ :
+//   ../editions/<ed>/pages/<n>.jpg  page images
+//   <ed>/manifest.js        window.__PAGES
+//   <ed>/oracle.js          window.__ORACLE (optional)
+//   <ed>/tokens/<n>.js      read tokens  (window.__PAGE_TOKENS)
+//   <ed>/review/<n>.js      review tokens (window.__PAGE_TOKENS)
+// Refresh button = location.reload() (page restored from memory).
+// Cache-busting for data scripts: token bundles are REBUILT by the
+// pipeline, and browsers otherwise keep serving the stale pre-fix bundles
+// from cache. A timestamp query makes every load fetch the current files
+// (local files: negligible cost). Page IMAGES are immutable and stay cached.
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src + (src.includes('?') ? '&' : '?') + '_=' + Date.now();
+    s.onload = () => res();
+    s.onerror = () => rej(new Error('missing ' + src));
+    document.head.appendChild(s);
+    setTimeout(() => rej(new Error('timeout ' + src)), 60000);
+  });
+}
+// ============================== edition + boot ==============================
+async function loadEdition(ed) {
+  if (!EDITIONS.includes(ed)) ed = 'warsh';
+  ED = ed;
+  try { localStorage.setItem('mushaf-edition', ED); } catch (e) {}
+  $('edSel').value = ED;
+  pages = []; pageIdx = -1; tokens = [];
+  selectedIdx = null; lastClickX = null;
+  pageAnchors = []; anchorMap = [];
+  spanWords = []; spanFirst = spanLast = null; spanSkip = []; spanDict = {};
+  anchorDirty = {};
+  loadAnchorsLocal();
+  oracle = null;
+  wordbody.innerHTML = '<p class="hint">Tap a word on the page.</p>';
+  info.textContent = '';
+  try {
+    await loadScript(ED + '/manifest.js');
+    const nums = window.__PAGES || [];
+    if (!nums.length) throw new Error('empty manifest for ' + ED);
+    pages = nums.map(n => ({ num: n, readTok: null, revTok: null, dirty: false }));
+    try {
+      await loadScript(ED + '/oracle.js');
+      oracle = window.__ORACLE || null;
+    } catch (e) { oracle = null; }
+    finishIndex();
+  } catch (err) {
+    loadStatus.textContent = 'Could not load ' + ED + ' data (' + esc(err.message) + '). ';
+  }
+  checkServerDot(); // non-blocking; enables one-click save when serve.py runs
+}
+async function boot() { await loadEdition(ED); }
+$('edSel').onchange = e => { loadEdition(e.target.value); };
+// Local companion server (py serve.py): one-click silent save —
+// no dialogs at all. REQUIRED: start web/serve.bat before reviewing.
+const SERVER_URL = 'http://127.0.0.1:8765';
+let SERVER_CAPS = null;   // status payload (has .finalize + .export when current)
+async function serverUp() {
+  try {
+    const r = await fetch(SERVER_URL + '/api/status', { cache: 'no-store' });
+    if (!r.ok) return false;
+    try { SERVER_CAPS = await r.json(); } catch (e) { SERVER_CAPS = {}; }
+    return true;
+  } catch (e) { return false; }
+}
+async function checkServerDot() {
+  const el = $('srvdot');
+  if (await serverUp()) {
+    if (el) el.textContent = '● on — Save writes directly, no dialogs';
+  } else if (el) {
+    el.textContent = '○ off — start web/serve.bat';
+  }
+}
+async function saveViaServer(edited) {
+  // returns number of pages saved (0 = server unreachable, fall through)
+  let saved = 0;
+  for (const p of edited) {
+    try {
+      const arr = (p.revTok || []).slice()
+        .sort((a, b) => (a.y0 - b.y0) || (b.x0 - a.x0));
+      const r = await fetch(SERVER_URL + '/api/save/' + ED + '/' + p.num + '.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(arr),
+      });
+      if (!r.ok) break;
+      const j = await r.json().catch(() => ({}));
+      if (!j.ok) break;
+      p.revTok = arr;
+      saved++;
+    } catch (e) { break; }
+  }
+  return saved;
+}
+async function finalizeViaServer(pages) {
+  // rebuild the web bundle slices the app reloads
+  const r = await fetch(SERVER_URL + '/api/finalize', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ edition: ED, pages }),
+  });
+  if (r.status === 501)
+    throw new Error('OUTDATED_SERVER');
+  if (!r.ok) throw new Error('finalize HTTP ' + r.status);
+  const j = await r.json().catch(() => ({}));
+  if (!j.ok) throw new Error((j && j.error) || 'finalize failed');
+  return j.pages || {};
+}
+async function exportViaServer(pages) {
+  // convert the given pages and patch the Flutter app's bundled assets
+  const r = await fetch(SERVER_URL + '/api/export', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ edition: ED, pages }),
+  });
+  if (r.status === 501)
+    throw new Error('OUTDATED_SERVER');
+  if (!r.ok) throw new Error('export HTTP ' + r.status);
+  const j = await r.json().catch(() => ({}));
+  if (!j.ok) throw new Error((j && j.error) || 'export failed');
+  return j;
+}
+function refreshResStatus() {
+  loadStatus.textContent = pages.length
+    ? `${pages.length} pages · oracle:${oracle ? ' ✓' : ' ○'}`
+    : 'No pages — run the bundle builder next to this file.';
+}
+function markPageOptions() {
+  const sel = $('pageSel');
+  for (const o of sel.options) {
+    const n = parseInt(o.value, 10);
+    o.textContent = 'Page ' + n + (corrected[n] ? ' ✓' : '');
+  }
+}
+function finishIndex() {
+  const sel = $('pageSel');
+  sel.innerHTML = '';
+  for (const p of pages) {
+    const o = document.createElement('option');
+    o.value = p.num; o.textContent = 'Page ' + p.num;
+    sel.appendChild(o);
+  }
+  markPageOptions();
+  refreshResStatus();
+  const last = parseInt(localStorage.getItem(NS('mushaf-page')) || '1', 10);
+  const i = pages.findIndex(p => p.num === last);
+  loadPage(i >= 0 ? i : 0);
+}
+// ============================== page load / nav ==============================
+// loadGen guards the shared window.__PAGE_TOKENS slot: a stale navigation
+// that finishes after a newer one is discarded instead of showing the
+// wrong page's boxes.
+let loadGen = 0;
+async function loadPage(i) {
+  if (i < 0 || i >= pages.length) return;
+  pageIdx = i;
+  const p = pages[i];
+  const my = ++loadGen;
+  selectedIdx = null; lastClickX = null;
+  addDraft = null; dragStart = null; // never carry a half-drawn box across pages
+  save(NS('mushaf-page'), String(p.num));
+  const done = () => { if (my === loadGen) { fitAndDraw(); refreshChrome(); loadAnchorFor(p); } };
+  const showImg = () => {
+    img = new Image();
+    img.onload = done;
+    img.onerror = () => { if (my === loadGen) info.textContent = 'Page image missing: ../editions/' + ED + '/pages/' + p.num + '.jpg'; };
+    img.src = '../editions/' + ED + '/pages/' + p.num + '.jpg';
+  };
+  if (p.revTok) { tokens = p.revTok; sortTokens(); showImg(); return; }
+  try {
+    window.__PAGE_TOKENS = null;
+    await loadScript(ED + '/review/' + p.num + '.js');
+    if (my !== loadGen) return; // superseded: another page was requested
+    tokens = window.__PAGE_TOKENS;
+    window.__PAGE_TOKENS = null;
+    if (!Array.isArray(tokens)) throw new Error('expected a token list');
+    sortTokens();
+    p.revTok = tokens;
+  } catch (err) {
+    tokens = [];
+    info.textContent = 'Tokens missing: ' + ED + '/review/' + p.num + '.js';
+  }
+  // Review boxes carry geometry only: preload the read (final) bundle so a
+  // tap can show the overlapping word's text (see readMatchFor).
+  if (my === loadGen && !p.readTok) {
+    try {
+      window.__PAGE_TOKENS = null;
+      await loadScript(ED + '/tokens/' + p.num + '.js');
+      if (my !== loadGen) return;
+      const rt = window.__PAGE_TOKENS;
+      window.__PAGE_TOKENS = null;
+      if (Array.isArray(rt)) p.readTok = rt;
+    } catch (e) { /* boxes stay editable; word text just unavailable */ }
+  }
+  showImg();
+}
+function sortTokens() {
+  tokens.sort((a, b) => (a.y0 - b.y0) || (b.x0 - a.x0));
+}
+// Overlap of a/b as a fraction of the SMALLER box: a raw review piece sits
+// inside one final word box, so the best match owns nearly all of it.
+function overlapMin(a, b) {
+  const ix = Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0));
+  const iy = Math.max(0, Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0));
+  if (ix <= 0 || iy <= 0) return 0;
+  const aa = (a.x1 - a.x0) * (a.y1 - a.y0), ab = (b.x1 - b.x0) * (b.y1 - b.y0);
+  if (aa <= 0 || ab <= 0) return 0;
+  return (ix * iy) / Math.min(aa, ab);
+}
+// Read (final) word whose box best overlaps tapped review box t.
+function readMatchFor(t) {
+  const p = pages[pageIdx];
+  const pool = (p && p.readTok) || [];
+  let best = null, bs = 0;
+  for (const w of pool) {
+    if (!w.arabic) continue;
+    const s = overlapMin(t, w);
+    if (s > bs) { bs = s; best = w; }
+  }
+  if (best) return best;
+  const cx = (t.x0 + t.x1) / 2, cy = (t.y0 + t.y1) / 2;
+  best = null; bs = Infinity;
+  for (const w of pool) {
+    if (!w.arabic) continue;
+    const dx = (w.x0 + w.x1) / 2 - cx, dy = (w.y0 + w.y1) / 2 - cy;
+    const d = dx * dx + dy * dy;
+    if (d < bs) { bs = d; best = w; }
+  }
+  return best;
+}
+function persistTokens() {
+  sortTokens();
+  const p = pages[pageIdx];
+  p.revTok = tokens;
+  p.dirty = true;
+  updateProgress();
+}
+function editedCount() { return pages.filter(p => p.dirty).length; }
+
+// ============================== rendering ==============================
+function fitAndDraw() {
+  const st = $('stage');
+  const availW = st.clientWidth || 800, availH = st.clientHeight || 600;
+  scale = Math.min(1, availW / img.width, availH / img.height);
+  canvas.width = Math.max(1, Math.round(img.width * scale));
+  canvas.height = Math.max(1, Math.round(img.height * scale));
+  draw();
+}
+function reviewColor(t) {
+  if (t.flagged) return css('--flagged');
+  if (t.type === 'marker') return css('--marker');
+  if (t.type === 'bismillah') return css('--bismillah');
+  return css('--word');
+}
+function tappable(t) {
+  return t.type === 'word' || t.type === 'bismillah' || t.type === 'marker';
+}
+function draw() {
+  if (!img.width) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const showAll = $('showBoxes').checked;
+  if (!showAll) { drawSelection(); return; }
+  tokens.forEach((t, idx) => {
+    if (!tappable(t)) return;
+    const sel = idx === selectedIdx;
+    const x0 = t.x0 * scale, y0 = t.y0 * scale,
+          w = (t.x1 - t.x0) * scale, h = (t.y1 - t.y0) * scale;
+    ctx.lineWidth = sel ? 3 : 1.2;
+    ctx.strokeStyle = sel ? css('--sel') : reviewColor(t);
+    ctx.strokeRect(x0, y0, w, h);
+    ctx.fillStyle = reviewColor(t);
+    ctx.font = `${Math.max(10, 11 * scale + 4)}px sans-serif`;
+    ctx.fillText(String(idx), x0 + 2, y0 + 12);
+    if (sel && lastClickX !== null) {
+      ctx.strokeStyle = '#000'; ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(lastClickX * scale, y0);
+      ctx.lineTo(lastClickX * scale, y0 + h);
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+  });
+  if (addDraft) {
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = css('--sel');
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(addDraft.x0 * scale, addDraft.y0 * scale,
+      (addDraft.x1 - addDraft.x0) * scale, (addDraft.y1 - addDraft.y0) * scale);
+    ctx.setLineDash([]);
+  }
+}
+function drawSelection() {
+  if (selectedIdx === null || !tokens[selectedIdx]) return;
+  const t = tokens[selectedIdx];
+  const x0 = t.x0 * scale, y0 = t.y0 * scale,
+        w = (t.x1 - t.x0) * scale, h = (t.y1 - t.y0) * scale;
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = css('--sel');
+  ctx.strokeRect(x0, y0, w, h);
+}
+canvas.addEventListener('click', e => {
+  if (suppressClick) { suppressClick = false; return; } // click trailing an add-box drag
+  const r = canvas.getBoundingClientRect();
+  const cx = (e.clientX - r.left) / scale, cy = (e.clientY - r.top) / scale;
+  const hit = tokens.findIndex(t => cx >= t.x0 && cx <= t.x1 && cy >= t.y0 && cy <= t.y1);
+  if (hit === -1) return;
+  if (hit === selectedIdx) lastClickX = Math.round(cx);
+  else { selectedIdx = hit; lastClickX = null; }
+  updateInfo();
+  showToken(tokens[selectedIdx]); // one tap: select the box AND see the word
+  draw();
+});
+$('showBoxes').addEventListener('change', draw);
+
+// ============================== word panel ==============================
+// Marker tokens carry geometry only (no key/arabic), but they sit in reading
+// order right after their ayah's last word, so the ayah is the previous
+// word token's ayah — via the anchor-corrected map first, else the final
+// read bundle. Full text joins that ayah's words from the same in-memory
+// streams. Falls back to bare ۝ N.
+function prevWordBoxIdx(t) {
+  const ti = tokens.indexOf(t);
+  if (ti < 0) return -1;
+  const words = wordBoxes();
+  for (let i = ti - 1; i >= 0; i--) {
+    if (tokens[i].type !== 'word') continue;
+    return words.indexOf(tokens[i]);
+  }
+  return -1;
+}
+function markerAyahKey(t) {
+  const wi = prevWordBoxIdx(t);
+  if (wi < 0) return null;
+  if (anchorMap[wi]) {
+    const m = anchorMap[wi].split(':');
+    if (m.length === 3) return m[0] + ':' + m[1];
+  }
+  const w = wordBoxes()[wi];
+  const r = w && readMatchFor(w);
+  if (r && r.key) {
+    const m = r.key.split(':');
+    if (m.length >= 2) return m[0] + ':' + m[1];
+  }
+  return null;
+}
+function ayahTextOf(ak) {
+  if (spanWords.length) {
+    const parts = [];
+    for (const w of spanWords) {
+      const m = w.key.split(':');
+      if (m[0] + ':' + m[1] === ak && w.arabic) parts.push(w.arabic);
+    }
+    if (parts.length) return parts.join(' ');
+  }
+  const p = pages[pageIdx];
+  const pool = (p && p.readTok) || [];
+  const parts = [];
+  for (const w of pool) {
+    if (!w.key || !w.arabic) continue;
+    const m = w.key.split(':');
+    if (m[0] + ':' + m[1] === ak) parts.push(w.arabic);
+  }
+  return parts.join(' ');
+}
+function showMarker(t) {
+  const ak = markerAyahKey(t);
+  const num = ak ? ak.split(':')[1] : '';
+  const text = ak ? ayahTextOf(ak) : '';
+  wordbody.innerHTML =
+    `<div class="ar" dir="rtl" lang="ar">۝${num ? ' ' + esc(num) : ''}</div>` +
+    (text
+      ? `<div class="ayahtext" dir="rtl" lang="ar">${esc(text)}</div>`
+      : `<div class="hint">Ayah${ak ? ' ' + esc(ak) : ''} — full text unavailable.</div>`) +
+    (ak ? `<div><span class="chip">marker → ${esc(ak)}</span></div>` : '');
+}
+function showToken(t) {
+  // Ayah-end roundel: it owns no words, so it must NEVER resolve to a
+  // neighboring word. Display ۝ + number and the marker's OWN full ayah text.
+  if (t && t.type === 'marker') { showMarker(t); return; }
+  // The start-anchored mapping is the truth under review: the tapped box
+  // shows its newly mapped word, never the (possibly drifted) final word.
+  let wi = -1, mapKey = null;
+  if (t && t.type === 'word' && anchorMap.length) {
+    wi = wordBoxes().indexOf(t);
+    mapKey = anchorMap[wi] || null;
+  }
+  let headAr = '', staleNote = '';
+  if (mapKey && spanDict[mapKey]) {
+    headAr = spanDict[mapKey];
+    const m = readMatchFor(t);
+    if (m && m.arabic && m.arabic !== headAr)
+      staleNote = `<div class="note">final bundle shows “${esc(m.arabic)}” — drifted, anchor wins</div>`;
+  } else {
+    // review boxes carry geometry only: show the overlapping read word
+    const m = t && readMatchFor(t);
+    if (m) headAr = m.arabic || '';
+  }
+  if (!headAr && t && t.arabic) headAr = t.arabic;
+  wordbody.innerHTML =
+    `<div class="ar" dir="rtl" lang="ar">${esc(headAr)}</div>` +
+    (mapKey ? `<div><span class="chip">map: Box${wi} → ${esc(mapKey)}</span></div>` : '');
+  if (staleNote) wordbody.innerHTML += staleNote;
+}
+try {
+  const sb = localStorage.getItem('mushaf-boxes');
+  if (sb !== null) $('showBoxes').checked = sb === '1';
+} catch (e) {}
+$('showBoxes').addEventListener('change', () => {
+  save('mushaf-boxes', $('showBoxes').checked ? '1' : '0');
+});
+
+// ============================== review chrome ==============================
+const btnSplit = $('btnSplit'), btnMergeLeft = $('btnMergeLeft'),
+      btnToggleType = $('btnToggleType'), btnClearFlag = $('btnClearFlag'),
+      btnDelete = $('btnDelete');
+function oracleFor(p) {
+  if (!oracle) return null;
+  if (oracle[String(p.num)]) return oracle[String(p.num)];
+  for (const k of ['page_' + String(p.num).padStart(3, '0'),
+                   'page_' + String(p.num).padStart(3, '0') + '.json'])
+    if (oracle[k]) return oracle[k];
+  return null;
+}
+function updateInfo() {
+  const has = selectedIdx !== null;
+  btnSplit.disabled = !(has && lastClickX !== null);
+  btnMergeLeft.disabled = !has || selectedIdx === 0;
+  btnToggleType.disabled = !has;
+  btnClearFlag.disabled = !has;
+  btnDelete.disabled = !has;
+  if (!pages.length || pageIdx < 0) return;
+  if (has) {
+    const t = tokens[selectedIdx];
+    info.innerHTML = `Page ${pages[pageIdx].num} token <b>#${selectedIdx}</b> — type:<b>${t.type}</b> box:[${t.x0},${t.y0},${t.x1},${t.y1}] w=${t.x1 - t.x0}` +
+      (t.flagged ? ' — <b style="color:var(--flagged)">flagged</b>' : '') +
+      (lastClickX !== null ? ` — split x=${lastClickX}` : '');
+  }
+}
+function updateProgress() {
+  progress.textContent = pages.length
+    ? `Page ${pageIdx + 1}/${pages.length} · corrected ${correctedCount()}/${pages.length} · edited ${editedCount()}`
+    : '';
+}
+function refreshChrome() {
+  const p = pages[pageIdx];
+  tokens = p.revTok;
+  if (!tokens) tokens = [];
+  $('pageSel').value = p.num;
+  sortTokens();
+  const f = tokens.filter(t => t.flagged).length;
+  const m = tokens.filter(t => t.type === 'marker').length;
+  const b = tokens.filter(t => t.type === 'bismillah').length;
+  stats.textContent = `Page ${p.num} · ${tokens.length} tokens (${tokens.length - m - b} word, ${m} marker, ${b} bismillah, ${f} flagged)${p.dirty ? ' · EDITED' : ''}`;
+  updateProgress();
+  const rep = oracleFor(p);
+  const verdict = $('verdict'), oraclebox = $('oraclebox');
+  if (!rep) {
+    verdict.className = 'unknown'; verdict.textContent = 'no oracle';
+    oraclebox.innerHTML = '';
+  } else if (rep.page_ok) {
+    verdict.className = 'pass'; verdict.textContent = 'oracle PASS ✓';
+    oraclebox.innerHTML = '';
+  } else {
+    verdict.className = 'fail'; verdict.textContent = 'oracle FAIL';
+    let html = '';
+    (rep.groups || []).forEach(g => {
+      if (g.edge) {
+        html += `<div>edge spot-check ayahs ${JSON.stringify(g.ayahs)} @y=${JSON.stringify(g.y)}</div>`;
+      } else if (g.ok === false) {
+        const ay = g.ayahs && g.ayahs.length ? `${JSON.stringify(g.ayahs[0])}..${JSON.stringify(g.ayahs[g.ayahs.length - 1])}` : '?';
+        html += `<div class="fail-line">◈ ayahs ${ay} @y=${JSON.stringify(g.y)}: ${g.n} boxes vs ${g.exp} expected${g.fail ? ' — ' + g.fail : ''}</div>`;
+      }
+    });
+    const skips = [];
+    (rep.groups || []).forEach(g => (g.skipped || []).forEach(s => skips.push(JSON.stringify(s))));
+    if (skips.length) html += `<div class="fail-line">△ missing marker for ayah ${skips.join(', ')} — add the roundel box</div>`;
+    if (rep.align && rep.align !== 'ok' && rep.align !== 'ok:expanded')
+      html += `<div class="fail-line">△ alignment: ${rep.align}</div>`;
+    if (!html) html = '<div class="fail-line">counts mismatch — see stats vs oracle.</div>';
+    oraclebox.innerHTML = html;
+  }
+  if (spanWords.length) buildAnchorMap();
+  updateMapLine();
+  updateInfo(); draw();
+}
+btnSplit.onclick = () => {
+  if (selectedIdx === null || lastClickX === null) return;
+  const t = tokens[selectedIdx];
+  if (lastClickX <= t.x0 || lastClickX >= t.x1) { info.textContent = 'Split point must be inside the box.'; return; }
+  tokens.splice(selectedIdx, 1, { ...t, x0: lastClickX, flagged: false }, { ...t, x1: lastClickX, flagged: false });
+  sortTokens();
+  selectedIdx = null; lastClickX = null; persistTokens(); refreshChrome();
+};
+btnMergeLeft.onclick = () => {
+  if (selectedIdx === null || selectedIdx === 0) return;
+  const l = tokens[selectedIdx - 1], r = tokens[selectedIdx];
+  tokens.splice(selectedIdx - 1, 2, { ...r, x0: Math.min(l.x0, r.x0), x1: Math.max(l.x1, r.x1), flagged: false });
+  sortTokens();
+  selectedIdx -= 1; lastClickX = null; persistTokens(); refreshChrome();
+};
+btnToggleType.onclick = () => {
+  if (selectedIdx === null) return;
+  const cur = tokens[selectedIdx].type;
+  tokens[selectedIdx].type = cur === 'word' ? 'marker' : (cur === 'marker' ? 'bismillah' : 'word');
+  persistTokens(); refreshChrome();
+};
+btnClearFlag.onclick = () => {
+  if (selectedIdx === null) return;
+  tokens[selectedIdx].flagged = false;
+  persistTokens(); refreshChrome();
+};
+$('btnClearAllFlags').onclick = () => {
+  if (!pages.length || pageIdx < 0) return;
+  const n = tokens.filter(t => t.flagged).length;
+  if (!n) { info.textContent = 'No flagged boxes on this page.'; return; }
+  tokens.forEach(t => { t.flagged = false; });
+  persistTokens(); refreshChrome();
+  info.textContent = `Cleared ${n} flag(s) on page ${pages[pageIdx].num}. Press Save ✓ Apply to app to record the correction.`;
+};
+btnDelete.onclick = () => {
+  if (selectedIdx === null) return;
+  tokens.splice(selectedIdx, 1);
+  sortTokens();
+  selectedIdx = null; lastClickX = null; persistTokens(); refreshChrome();
+};
+// ---------- add box: drag a rectangle for lines that have no boxes ----------
+// Toggle with the button (or key A); Shift+drag works even when toggled off.
+// Esc leaves add mode. Tiny drags (<8px) are treated as ordinary clicks.
+const btnAdd = $('btnAdd');
+function setAddMode(on) {
+  addMode = !!on;
+  btnAdd.textContent = 'Add box: ' + (addMode ? 'ON — drag on page' : 'off');
+  btnAdd.classList.toggle('active', addMode);
+  canvas.style.touchAction = addMode ? 'none' : 'manipulation';
+  if (!addMode) { addDraft = null; dragStart = null; draw(); }
+  else info.textContent = 'Add-box ON: drag a rectangle around the missing word, then Save ✓ Apply to app.';
+}
+btnAdd.onclick = () => setAddMode(!addMode);
+function canvasPt(e) {
+  const r = canvas.getBoundingClientRect();
+  return [(e.clientX - r.left) / scale, (e.clientY - r.top) / scale];
+}
+canvas.addEventListener('pointerdown', e => {
+  if (pageIdx < 0 || !img.width) return;
+  if (!addMode && !e.shiftKey) return;
+  const [cx, cy] = canvasPt(e);
+  const W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
+  dragStart = [Math.round(Math.max(0, Math.min(W, cx))),
+               Math.round(Math.max(0, Math.min(H, cy)))];
+  addDraft = null;
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  e.preventDefault();
+});
+canvas.addEventListener('pointermove', e => {
+  if (!dragStart) return;
+  const [cx, cy] = canvasPt(e);
+  const W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
+  const x = Math.round(Math.max(0, Math.min(W, cx)));
+  const y = Math.round(Math.max(0, Math.min(H, cy)));
+  if (Math.abs(x - dragStart[0]) < 4 && Math.abs(y - dragStart[1]) < 4) {
+    addDraft = null; draw(); return;
+  }
+  addDraft = { x0: Math.min(dragStart[0], x), y0: Math.min(dragStart[1], y),
+               x1: Math.max(dragStart[0], x), y1: Math.max(dragStart[1], y) };
+  draw();
+});
+canvas.addEventListener('pointerup', () => {
+  if (!dragStart) return;
+  dragStart = null;
+  const d = addDraft; addDraft = null;
+  if (!d || (d.x1 - d.x0) < 8 || (d.y1 - d.y0) < 8) { draw(); return; }
+  const t = { x0: d.x0, y0: d.y0, x1: d.x1, y1: d.y1, type: 'word', flagged: false };
+  tokens.push(t);
+  sortTokens();
+  selectedIdx = tokens.indexOf(t); lastClickX = null;
+  suppressClick = true; // swallow the click that follows pointerup
+  persistTokens(); refreshChrome();
+  info.textContent = `Added word box #${selectedIdx} [${t.x0},${t.y0},${t.x1},${t.y1}] — Toggle type if it is a marker/bismillah, then Save ✓ Apply to app.`;
+  draw();
+});
+canvas.addEventListener('pointercancel', () => {
+  dragStart = null; addDraft = null; draw();
+});
+// ---------- any-box mapping: Box N -> Word X, following boxes sequential ----------
+// Anchor any word box to a word; boxes after it continue Word X+1, X+2...
+// Multiple anchors compose (the latest box at or before each position wins
+// from there on). Unanchored leading boxes map from the page start.
+// Persisted per page in editions/<ed>/anchors.json via the server;
+// localStorage mirrors it.
+let pageAnchors = [];            // [{box, key}] for the current page
+let pickBox = 0;                 // box being anchored in the picker
+let spanWords = [];              // [{key, arabic}] surah window (server)
+let spanFirst = null, spanLast = null, spanSkip = [];
+let spanDict = {}, anchorMap = [];
+const spanCache = {};            // 'ed:num' -> words payload
+let anchorsLocal = {}, anchorDirty = {};  // local: {page: [{box,key}]}; dirty: {'ed:num': {box,key}|{clear}}
+function loadAnchorsLocal() {
+  try { anchorsLocal = JSON.parse(localStorage.getItem(NS('mushaf-anchor-v1')) || '{}'); }
+  catch (e) { anchorsLocal = {}; }
+}
+function saveAnchorsLocal() {
+  try { localStorage.setItem(NS('mushaf-anchor-v1'), JSON.stringify(anchorsLocal)); } catch (e) {}
+}
+loadAnchorsLocal();
+function wordBoxes() { return tokens.filter(t => t.type === 'word'); }
+function cmpKey(a, b) {
+  const x = a.split(':').map(Number), y = b.split(':').map(Number);
+  for (let i = 0; i < 3; i++) { if (x[i] !== y[i]) return x[i] - y[i]; }
+  return 0;
+}
+function normAnchors(v) {
+  if (!Array.isArray(v)) return [];
+  return v.filter(a => a && Number.isInteger(a.box) && a.box >= 0 && typeof a.key === 'string');
+}
+// Composed sequential map for n word boxes under an anchor list — mirrors
+// assign_words: base from page start, each anchor restarts its tail.
+function composeMap(n, list) {
+  const out = new Array(n);
+  if (!spanWords.length || spanFirst == null) return out;
+  const skip = new Set(spanSkip);
+  const idxOf = {};
+  spanWords.forEach((w, i) => { idxOf[w.key] = i; });
+  const eff = [{ box: 0, key: spanFirst }]
+    .concat((list || []).slice().sort((a, b) => a.box - b.box));
+  for (let i = 0; i < n; i++) {
+    let a = eff[0];
+    for (const an of eff) { if (an.box <= i) a = an; else break; }
+    if (!a || !a.key) { out[i] = undefined; continue; }
+    const si = idxOf[a.key];
+    if (si == null) { out[i] = undefined; continue; }
+    let steps = i - a.box, k = undefined;
+    for (let j = si; j < spanWords.length; j++) {
+      if (skip.has(spanWords[j].key)) continue;
+      if (spanLast && cmpKey(spanWords[j].key, spanLast) > 0) break;
+      if (steps === 0) { k = spanWords[j].key; break; }
+      steps--;
+    }
+    out[i] = k;
+  }
+  return out;
+}
+function buildAnchorMap() {
+  anchorMap = composeMap(wordBoxes().length, pageAnchors);
+}
+function currentKeyFor(box) {
+  return composeMap(box + 1, pageAnchors)[box];
+}
+function updateMapLine() {
+  const el = $('mapline');
+  if (pageIdx < 0 || !pages.length) { el.textContent = ''; return; }
+  const num = pages[pageIdx].num;
+  const boxes = wordBoxes();
+  const an = pageAnchors.slice().sort((a, b) => a.box - b.box);
+  $('btnMapClear').disabled = !an.length;
+  let s = boxes.length ? `${boxes.length} word box(es)` : 'No word boxes on this page.';
+  if (an.length) s += ' · anchors: ' + an.map(a => `Box${a.box}→${a.key}`).join(', ');
+  else s += ` · Box 0 auto → ${spanFirst || 'page start'}`;
+  const mapped = anchorMap.filter(k => k !== undefined);
+  if (boxes.length && anchorMap.length) {
+    s += ` · ${mapped.length}/${boxes.length} mapped` +
+      (mapped.length ? ` (${mapped[0]}..${mapped[mapped.length - 1]})` : '') +
+      (mapped.length < boxes.length ? `, ${boxes.length - mapped.length} unmapped` : ', all covered');
+  }
+  if (anchorDirty[ED + ':' + num] !== undefined) s += ' · unsynced — Save to apply';
+  el.textContent = s;
+}
+async function ensureSpan(ed, num) {
+  const ck = ed + ':' + num;
+  if (spanCache[ck]) {
+    const w = spanCache[ck];
+    spanWords = w.words; spanFirst = w.first; spanLast = w.last;
+    spanSkip = w.skip || [];
+    spanDict = Object.fromEntries(spanWords.map(x => [x.key, x.arabic]));
+    return true;
+  }
+  try {
+    const r = await fetch(SERVER_URL + '/api/words/' + ed + '/' + num + '.json', { cache: 'no-store' });
+    if (!r.ok) return false;
+    const j = await r.json().catch(() => ({}));
+    if (!j || !j.ok || !Array.isArray(j.words)) return false;
+    spanCache[ck] = j;
+    spanWords = j.words; spanFirst = j.first; spanLast = j.last;
+    spanSkip = j.skip || [];
+    spanDict = Object.fromEntries(spanWords.map(x => [x.key, x.arabic]));
+    return true;
+  } catch (e) { return false; }
+}
+async function loadAnchorFor(p) {
+  const ed = ED, num = p.num;
+  pageAnchors = []; anchorMap = [];
+  spanWords = []; spanFirst = spanLast = null; spanSkip = []; spanDict = {};
+  $('mappick').style.display = 'none';
+  updateMapLine();
+  try {
+    const r = await fetch(SERVER_URL + '/api/anchor/' + ed + '/' + num + '.json', { cache: 'no-store' });
+    if (pageIdx < 0 || pages[pageIdx].num !== num || ED !== ed) return; // stale
+    if (r.ok) {
+      const j = await r.json().catch(() => ({}));
+      if (j && j.ok && Array.isArray(j.anchors)) pageAnchors = normAnchors(j.anchors);
+      if (pageAnchors.length) anchorsLocal[num] = pageAnchors; else delete anchorsLocal[num];
+      saveAnchorsLocal();
+    } else {
+      pageAnchors = normAnchors(anchorsLocal[num]); // server down: local mirror
+    }
+  } catch (e) { pageAnchors = normAnchors(anchorsLocal[num]); }
+  if (pageIdx < 0 || pages[pageIdx].num !== num || ED !== ed) return;
+  await ensureSpan(ed, num);
+  if (pageIdx < 0 || pages[pageIdx].num !== num || ED !== ed) return;
+  buildAnchorMap(); updateMapLine(); draw();
+}
+async function pushAnchor(ed, num, box, key) {
+  try {
+    const r = await fetch(SERVER_URL + '/api/anchor/' + ed + '/' + num + '.json', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(key == null ? { box, key: null } : { box, key }),
+    });
+    if (!r.ok) return false;
+    const j = await r.json().catch(() => ({}));
+    return !!(j && j.ok);
+  } catch (e) { return false; }
+}
+async function pushClearAll(ed, num) {
+  try {
+    const r = await fetch(SERVER_URL + '/api/anchor/' + ed + '/' + num + '.json', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clear: true }),
+    });
+    if (!r.ok) return false;
+    const j = await r.json().catch(() => ({}));
+    return !!(j && j.ok);
+  } catch (e) { return false; }
+}
+function setAnchor(num, box, key) {
+  const cur = pageAnchors.filter(a => a.box !== box);
+  if (key != null) cur.push({ box, key });
+  cur.sort((a, b) => a.box - b.box);
+  pageAnchors = cur;
+  if (cur.length) anchorsLocal[num] = cur; else delete anchorsLocal[num];
+  anchorDirty[ED + ':' + num] = { box, key: key == null ? null : key };
+  saveAnchorsLocal();
+  buildAnchorMap(); updateMapLine(); draw();
+  pushAnchor(ED, num, box, key).then(ok => {
+    if (ok) delete anchorDirty[ED + ':' + num];
+    else info.textContent = 'Anchor kept locally — start web/serve.bat and press Save to sync it.';
+    updateMapLine();
+  });
+}
+function clearAnchors(num) {
+  pageAnchors = [];
+  delete anchorsLocal[num];
+  anchorDirty[ED + ':' + num] = { clear: true };
+  saveAnchorsLocal();
+  buildAnchorMap(); updateMapLine(); draw();
+  pushClearAll(ED, num).then(ok => {
+    if (ok) delete anchorDirty[ED + ':' + num];
+    else info.textContent = 'Clear kept locally — start web/serve.bat and press Save to sync it.';
+    updateMapLine();
+  });
+}
+function fillPicker() {
+  const sel = $('mapSel');
+  sel.innerHTML = '';
+  const cur = currentKeyFor(pickBox) || spanFirst;
+  if (cur && !spanWords.some(w => w.key === cur)) {
+    const o = document.createElement('option');
+    o.value = cur; o.textContent = cur + ' — ' + (spanDict[cur] || '?');
+    sel.appendChild(o);
+  }
+  for (const w of spanWords) {
+    const o = document.createElement('option');
+    const inSpan = spanFirst && spanLast &&
+      cmpKey(w.key, spanFirst) >= 0 && cmpKey(w.key, spanLast) <= 0;
+    o.value = w.key;
+    o.textContent = w.key + ' — ' + String(w.arabic || '').slice(0, 28) + (inSpan ? '' : ' (outside page span)');
+    sel.appendChild(o);
+  }
+  if (cur) sel.value = cur;
+  previewPick();
+}
+function previewPick() {
+  const key = $('mapSel').value;
+  const n = wordBoxes().length;
+  const hypo = pageAnchors.filter(a => a.box !== pickBox).concat([{ box: pickBox, key }]);
+  const m = composeMap(n, hypo);
+  const mapped = m.filter(k => k !== undefined);
+  let s = `Box ${pickBox} → ${key}` +
+    (mapped.length ? ` … → ${mapped[mapped.length - 1]} (${mapped.length}/${n} mapped)` : ' (nothing maps — past span end?)');
+  if (mapped.length < n) s += ` — ${n - mapped.length} box(es) unmapped (will flag extra-box).`;
+  const others = pageAnchors.filter(a => a.box !== pickBox);
+  if (others.length) s += ` · keeps: ${others.map(a => `Box${a.box}→${a.key}`).join(', ')}`;
+  $('mappreview').textContent = s;
+}
+$('btnMapStart').onclick = async () => {
+  const panel = $('mappick');
+  if (panel.style.display !== 'none') { panel.style.display = 'none'; return; }
+  if (pageIdx < 0) return;
+  // Anchor box = selected word box, else Box 0.
+  pickBox = 0;
+  if (selectedIdx !== null && tokens[selectedIdx] && tokens[selectedIdx].type === 'word')
+    pickBox = wordBoxes().indexOf(tokens[selectedIdx]);
+  if (pickBox < 0) pickBox = 0;
+  $('btnMapApply').textContent = `Apply Box ${pickBox} → word`;
+  panel.style.display = 'block';
+  $('mappreview').textContent = 'Loading page words…';
+  if (!(await ensureSpan(ED, pages[pageIdx].num))) {
+    $('mappreview').textContent = 'Word list needs the local server — double-click web/serve.bat, then retry.';
+    $('mapSel').innerHTML = '';
+    return;
+  }
+  fillPicker();
+};
+$('mapSel').onchange = previewPick;
+$('btnMapApply').onclick = () => {
+  if (pageIdx < 0 || !$('mapSel').value) return;
+  setAnchor(pages[pageIdx].num, pickBox, $('mapSel').value);
+  $('mappick').style.display = 'none';
+  info.textContent = `Box ${pickBox} → ${$('mapSel').value} — following boxes map sequentially. Save to apply.`;
+};
+$('btnMapClear').onclick = () => {
+  if (pageIdx < 0 || !pageAnchors.length) return;
+  const num = pages[pageIdx].num;
+  // Clearing with a word box selected drops just its anchor; else all.
+  if (selectedIdx !== null && tokens[selectedIdx] && tokens[selectedIdx].type === 'word') {
+    const b = wordBoxes().indexOf(tokens[selectedIdx]);
+    if (b >= 0 && pageAnchors.some(a => a.box === b)) {
+      setAnchor(num, b, null);
+      info.textContent = `Box ${b} anchor removed — following boxes fall back.`;
+      return;
+    }
+  }
+  clearAnchors(num);
+  info.textContent = 'All page anchors cleared — back to page-start mapping.';
+};
+// ============================== ONE-BUTTON save → apply → export ==============================
+// Single click does the whole pipeline for every touched page:
+//   1. PUT edited boxes to editions/<ed>/boxes_raw/
+//   2. sync pending box→word anchors
+//   3. POST /api/finalize — rebuild this page's web bundle slices + verdicts
+//   4. POST /api/export   — convert these exact pages into the Flutter app's
+//      bundled page_boxes.json + page_markers.json (with whole-file backup)
+// Needs web/serve.bat running (v7+). No dialogs, no second button.
+$('btnSave').onclick = async () => {
+  const edited = pages.filter(p => p.dirty && p.revTok);
+  const anchPages = Object.keys(anchorDirty).map(k => ({ ed: k.split(':')[0], n: parseInt(k.split(':')[1], 10) }))
+    .filter(x => x.ed === ED && !isNaN(x.n));
+  if (!edited.length && !anchPages.length) { info.textContent = 'Nothing edited yet.'; return; }
+  await checkServerDot(); // awaited: SERVER_CAPS must be fresh, not boot-era
+  if (!SERVER_CAPS || !SERVER_CAPS.finalize || !SERVER_CAPS.export) {
+    info.textContent = !SERVER_CAPS
+      ? 'No local server running — double-click web/serve.bat, then press Save again.'
+      : 'Your server is outdated and cannot apply/export. Ctrl+C the server window, double-click web/serve.bat again, then press Save again — no edits lost.';
+    return;
+  }
+  // 1) boxes
+  info.textContent = `Saving ${edited.length} page(s)…`;
+  const nSrv = edited.length ? await saveViaServer(edited) : 0;
+  if (edited.length && nSrv !== edited.length) {
+    info.textContent = `Saved ${nSrv}/${edited.length} via server, then it stopped responding — retry Save.`;
+    return;
+  }
+  // 2) anchors ride along (mapping-only changes need no box edits)
+  const anchFail = [];
+  for (const { ed, n } of anchPages) {
+    const d = anchorDirty[ed + ':' + n];
+    const ok = d && d.clear ? await pushClearAll(ed, n) : await pushAnchor(ed, n, d.box, d.key);
+    if (ok) delete anchorDirty[ed + ':' + n];
+    else anchFail.push(n);
+  }
+  // 3+4) finalize + export the exact touched pages in one go
+  const nums = [...new Set([...edited.map(p => p.num), ...anchPages.map(x => x.n)])]
+    .sort((a, b) => a - b);
+  info.textContent = `Saved. Applying + exporting ${nums.join(', ')} to the app…`;
+  try {
+    await finalizeViaServer(nums);
+    const j = await exportViaServer(nums);
+    const touched = pages.filter(p => nums.includes(p.num));
+    stampCorrected(touched); // a correction was made on these pages
+    for (const p of edited) {
+      p.dirty = false;
+      p.readTok = null;   // drop stale caches: reload shows fresh data
+      p.revTok = null;
+    }
+    try {
+      window.__ORACLE = null;
+      await loadScript(ED + '/oracle.js');
+      oracle = window.__ORACLE || oracle;
+    } catch (e) { /* badge falls back below */ }
+    updateProgress();
+    if (pageIdx >= 0) await loadPage(pageIdx);
+    const res = j.pages || {};
+    const lines = nums.map(n => {
+      const r = res[String(n)] || {};
+      if (!r.ok) return `p${n}: FAILED — ${r.error || '?'}`;
+      const warn = (r.warnings || []).length ? ` (${r.warnings.join('; ')})` : '';
+      return `p${n}: ${r.boxes} boxes, ${r.markers} markers${warn}`;
+    });
+    const okCount = nums.filter(n => (res[String(n)] || {}).ok).length;
+    info.innerHTML = `Applied to app ✓ — ${okCount}/${nums.length} page(s)` +
+      (j.backup ? `<br>Backup: ${esc(j.backup)}` : '') +
+      `<br>` + lines.map(esc).join('<br>') +
+      (anchFail.length ? `<br>Anchor NOT synced for p${anchFail.join(', p')} — retry Save.` : '') +
+      `<br>Review the page above — boxes and badges are fresh. Rebuild the app (flutter run) to see it on-device.`;
+  } catch (err) {
+    if (err && err.message === 'OUTDATED_SERVER')
+      info.textContent = 'Boxes saved, but your server is outdated. ' +
+        'Ctrl+C the server window, double-click web/serve.bat again, then press Save once more — no edits lost.';
+    else
+      info.textContent = 'Saved boxes, but apply/export failed (' + esc(err.message) +
+        ') — is web/serve.bat still running? Retry Save.';
+  }
+};
+$('btnNextFail').onclick = () => {
+  if (!pages.length) return;
+  for (let step = 1; step <= pages.length; step++) {
+    const i = (pageIdx + step) % pages.length;
+    const rep = oracleFor(pages[i]);
+    if (rep && !rep.page_ok) { loadPage(i); return; }
+  }
+  info.textContent = oracle ? 'No FAIL pages — all pass ✓' : 'Load the oracle report first.';
+};
+$('btnNextUncorr').onclick = () => {
+  if (!pages.length) return;
+  const start = pageIdx < 0 ? 0 : (pageIdx + 1) % pages.length;
+  for (let k = 0; k < pages.length; k++) {
+    const i = (start + k) % pages.length;
+    if (!corrected[pages[i].num]) { loadPage(i); return; }
+  }
+  info.textContent = 'All pages corrected ✓ — nothing new.';
+};
+// ============================== nav + boot ==============================
+$('btnPrev').onclick = () => loadPage(pageIdx - 1);
+$('btnNext').onclick = () => loadPage(pageIdx + 1);
+$('pageSel').onchange = e => {
+  const i = pages.findIndex(p => p.num === parseInt(e.target.value, 10));
+  if (i >= 0) loadPage(i);
+};
+document.addEventListener('keydown', e => {
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === 'ArrowRight') loadPage(pageIdx + 1);
+  else if (e.key === 'ArrowLeft') loadPage(pageIdx - 1);
+  else if (e.key === 'a' || e.key === 'A') setAddMode(!addMode);
+  else if (e.key === 'Escape' && addMode) setAddMode(false);
+});
+window.addEventListener('resize', () => { if (img.width) fitAndDraw(); });
+boot();
+</script>
+</body>
+</html>

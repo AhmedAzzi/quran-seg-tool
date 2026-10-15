@@ -1,0 +1,16 @@
+{
+  "_comment": "Warsh 'an Nafi' custom mushaf edition. Paths are relative to --base-dir.",
+  "edition_id": "warsh",
+  "display_name": "Warsh 'an Nafi' (custom mushaf)",
+  "words_file": "editions/warsh/app_words.json",
+  "numbering_map_file": "editions/warsh/numbering_map.json",
+  "app_pages_file": "editions/warsh/app_pages.json",
+  "normalize": {
+    "strip_tatweel": true,
+    "alef_variants": true,
+    "hamza_variants": true,
+    "maqsurah_to_ya": true,
+    "yeh_variants": true
+  },
+  "min_confidence": 0.6
+}

@@ -1,0 +1,92 @@
+[
+ {
+  "id": "alafasy",
+  "subdir": "Alafasy_128kbps",
+  "times_key": "Alafasy_128kbps"
+ },
+ {
+  "id": "husary",
+  "subdir": "Husary_128kbps",
+  "times_key": "Husary_128kbps"
+ },
+ {
+  "id": "husary_mujawwad",
+  "subdir": "Husary_128kbps_Mujawwad",
+  "times_key": "Husary_128kbps_Mujawwad"
+ },
+ {
+  "id": "husary_muallim",
+  "subdir": "Husary_Muallim_128kbps",
+  "times_key": "Husary_Muallim_128kbps"
+ },
+ {
+  "id": "basit_murattal",
+  "subdir": "Abdul_Basit_Murattal_192kbps",
+  "times_key": "Abdul_Basit_Murattal_192kbps"
+ },
+ {
+  "id": "basit_mujawwad",
+  "subdir": "Abdul_Basit_Mujawwad_128kbps",
+  "times_key": "Abdul_Basit_Mujawwad_128kbps"
+ },
+ {
+  "id": "minshawy_murattal",
+  "subdir": "Minshawy_Murattal_128kbps",
+  "times_key": "Minshawy_Murattal_128kbps"
+ },
+ {
+  "id": "minshawy_mujawwad",
+  "subdir": "Minshawy_Mujawwad_192kbps",
+  "times_key": "Minshawy_Mujawwad_192kbps"
+ },
+ {
+  "id": "minshawy_teacher",
+  "subdir": "Minshawy_Teacher_128kbps",
+  "times_key": "Minshawy_Teacher_128kbps"
+ },
+ {
+  "id": "muaiqly",
+  "subdir": "MaherAlMuaiqly128kbps",
+  "times_key": "MaherAlMuaiqly128kbps"
+ },
+ {
+  "id": "basfar",
+  "subdir": "Abdullah_Basfar_192kbps",
+  "times_key": "Abdullah_Basfar_192kbps"
+ },
+ {
+  "id": "ajamy",
+  "subdir": "Ahmed_ibn_Ali_al_Ajamy_128kbps",
+  "times_key": "Ahmed_ibn_Ali_al_Ajamy_128kbps_ketaballah"
+ },
+ {
+  "id": "ayyoub",
+  "subdir": "Muhammad_Ayyoub_128kbps",
+  "times_key": "Muhammad_Ayyoub_128kbps"
+ },
+ {
+  "id": "jibreel",
+  "subdir": "Muhammad_Jibreel_128kbps",
+  "times_key": "Muhammad_Jibreel_128kbps"
+ },
+ {
+  "id": "rifai",
+  "subdir": "Hani_Rifai_192kbps",
+  "times_key": "Hani_Rifai_192kbps"
+ },
+ {
+  "id": "abbad",
+  "subdir": "Fares_Abbad_64kbps",
+  "times_key": "Fares_Abbad_64kbps"
+ },
+ {
+  "id": "ghamadi",
+  "subdir": "Ghamadi_40kbps",
+  "times_key": "Ghamadi_40kbps"
+ },
+ {
+  "id": "hudhaify",
+  "subdir": "Hudhaify_128kbps",
+  "times_key": "Hudhaify_128kbps"
+ }
+]

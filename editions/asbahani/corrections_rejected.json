@@ -1,0 +1,76 @@
+{
+ "011": {
+  "deferred Tier 2": {}
+ },
+ "028": {
+  "deferred Tier 2": {}
+ },
+ "067": {
+  "deferred Tier 2": {}
+ },
+ "083": {
+  "deferred Tier 2": {}
+ },
+ "132": {
+  "deferred Tier 2": {}
+ },
+ "147": {
+  "deferred Tier 2": {}
+ },
+ "239": {
+  "deferred Tier 2": {}
+ },
+ "359": {
+  "deferred Tier 2": {}
+ },
+ "376": {
+  "deferred Tier 2": {}
+ },
+ "413": {
+  "deferred Tier 2": {}
+ },
+ "421": {
+  "deferred Tier 2": {}
+ },
+ "483": {
+  "deferred Tier 2": {}
+ },
+ "518": {
+  "deferred Tier 2": {}
+ },
+ "533": {
+  "deferred Tier 2": {}
+ },
+ "548": {
+  "deferred Tier 2": {}
+ },
+ "550": {
+  "deferred Tier 2": {}
+ },
+ "564": {
+  "deferred Tier 2": {}
+ },
+ "584": {
+  "skip": [
+   "79:41:1"
+  ],
+  "merge_words": [
+   [
+    135,
+    136
+   ]
+  ]
+ },
+ "592": {
+  "deferred Tier 2": {}
+ },
+ "596": {
+  "deferred Tier 2": {}
+ },
+ "600": {
+  "deferred Tier 2": {}
+ },
+ "602": {
+  "deferred Tier 2": {}
+ }
+}

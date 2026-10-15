@@ -1,0 +1,4 @@
+# Regenerated / local-only: never commit.
+__pycache__/
+*.pyc
+bak/

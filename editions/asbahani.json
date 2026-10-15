@@ -1,0 +1,15 @@
+{
+  "edition_id": "asbahani",
+  "display_name": "Al-Asbahani 'an Warsh (custom mushaf)",
+  "words_file": "editions/asbahani/app_words.json",
+  "numbering_map_file": "editions/asbahani/numbering_map.json",
+  "app_pages_file": "editions/asbahani/app_pages.json",
+  "normalize": {
+    "strip_tatweel": true,
+    "alef_variants": true,
+    "hamza_variants": true,
+    "maqsurah_to_ya": true,
+    "yeh_variants": true
+  },
+  "min_confidence": 0.6
+}
