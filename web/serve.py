@@ -8,7 +8,7 @@ Why: browsers give web pages no silent path to local folders. This
 localhost-only server accepts the app's single Save button:
   PUT  /api/save/<edition>/<n>.json  edited boxes -> boxes_raw
   POST /api/finalize  {edition, pages}  rebuild the web bundle slices
-  POST /api/export    {edition, pages}  patch the Flutter app's assets
+  POST /api/export    {edition, pages}  patch this repo's pack inputs
 No server -> the app cannot save; start web/serve.bat first.
 
 Corrections: every applied save appends one line to
@@ -16,10 +16,11 @@ editions/<edition>/corrections_log.jsonl ({at, page, tokens}) — that file
 plus editions/<edition>/boxes_raw/ IS the reviewer's deliverable.
 
 Export: POST /api/export converts the given pages (pixel boxes ->
-Flutter fractions, word keys, marker spots) and patches the app's
-bundled assets directly, with whole-file backups under
-files/bak/app_export/ and a watermark at
-editions/<edition>/last_app_export.json.
+Flutter fractions, word keys, marker spots) and patches
+editions/<edition>/page_boxes.json + page_markers.json, with whole-file
+backups under bak/app_export/ (local only, git-ignored) and a watermark at
+editions/<edition>/last_app_export.json. The next push rebuilds the
+downloadable packs automatically.
 
 Safety: binds 127.0.0.1 only; writes ONLY editions/<ed>/boxes_raw/<digits>.json
 (path-traversal impossible by construction: edition allow-listed, page must
@@ -103,20 +104,21 @@ def finalize_pages(ed, pages):
     return {'ok': True, 'pages': results}
 
 
-# ---------- export to app (web "Save ✓ Apply to app" button -> Flutter assets) ----------
-# Bridges the review loop into the shipped app WITHOUT moving the web tool:
-# the exact pages the reviewer just saved are converted (pixel -> app
+# ---------- export to pack inputs (web "Save" button -> repo pack data) ----------
+# Bridges the review loop into the downloadable packs WITHOUT leaving this
+# repo: the exact pages the reviewer just saved are converted (pixel -> app
 # fractions, word-key assignment mirroring mushaf.html composeMap, marker
-# spots mirroring build_markers.py) and patched into the Flutter app's
-# bundled assets:
-#   <APP_ROOT>/assets/mushafs/<id>/data/page_boxes.json
-#   <APP_ROOT>/assets/mushaf/<id>/data/page_markers.json  (markers live beside boxes)
+# spots mirroring build_markers.py) and patched into this repo's pack
+# inputs:
+#   editions/<ed>/page_boxes.json
+#   editions/<ed>/page_markers.json
+# The next push rebuilds + republishes the packs automatically
+# (see .github/workflows/build-packs.yml).
 # Corrected-only: the client sends the exact pages it just saved.
 # Whole-file backups land
-# in files/bak/app_export/ before any write; per-page isolation (one bad
-# page never blocks the rest, watermark advances only for ok pages).
-APP_ROOT = Path(r'C:\Users\AHMED\Desktop\Husn-el-Muslim')
-APP_EDITION_ID = {'warsh': 'warsh', 'hafs': 'hafs', 'asbahani': 'asbahani'}
+# in bak/app_export/ (git-ignored, local only) before any write; per-page
+# isolation (one bad page never blocks the rest, watermark advances only
+# for ok pages).
 R_LO, R_HI = 0.021, 0.036  # marker radius clamp, fraction of page height
 
 
@@ -397,22 +399,22 @@ class ExportError(Exception):
 
 
 def export_pages_to_app(ed, pages):
-    """Patch the Flutter app's bundled assets for the given pages.
+    """Patch this repo's pack inputs for the given pages.
     Per-page isolation; watermark advances only for ok pages."""
-    if ed not in EDITIONS or ed not in APP_EDITION_ID:
+    if ed not in EDITIONS:
         return {'ok': False, 'error': f'unknown edition {ed}', 'pages': {}}
-    app_data = APP_ROOT / 'assets' / 'mushafs' / APP_EDITION_ID[ed] / 'data'
-    boxes_path = app_data / 'page_boxes.json'
-    markers_path = app_data / 'page_markers.json'
+    pack_data = ROOT / 'editions' / ed
+    boxes_path = pack_data / 'page_boxes.json'
+    markers_path = pack_data / 'page_markers.json'
     if not boxes_path.exists() or not markers_path.exists():
         return {'ok': False,
-                'error': f'no bundled app assets for {ed} at {app_data}',
+                'error': f'no pack data for {ed} at {pack_data}',
                 'pages': {}}
     try:
         boxes_doc = json.loads(boxes_path.read_text(encoding='utf-8'))
         markers_doc = json.loads(markers_path.read_text(encoding='utf-8'))
     except (OSError, ValueError) as e:
-        return {'ok': False, 'error': f'unreadable app assets: {e}',
+        return {'ok': False, 'error': f'unreadable pack data: {e}',
                 'pages': {}}
     built = {}
     for n in pages:
@@ -439,11 +441,11 @@ def export_pages_to_app(ed, pages):
         entry = (boxes_doc.get('pages', {}) or {}).get(pkey)
         if entry is None:
             built[str(n)] = {'ok': False,
-                             'error': f'app has no page entry {pkey}'}
+                             'error': f'pack data has no page entry {pkey}'}
             continue
         if entry.get('w') != payload['W'] or entry.get('h') != payload['H']:
             warnings.append(
-                f"dims app {entry.get('w')}x{entry.get('h')} vs "
+                f"dims data {entry.get('w')}x{entry.get('h')} vs "
                 f"image {payload['W']}x{payload['H']}")
         built[str(n)] = {'ok': True, 'src': payload['src'],
                          'boxes': len(payload['boxes']),

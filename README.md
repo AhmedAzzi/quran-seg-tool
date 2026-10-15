@@ -22,8 +22,8 @@ localhost-only server (`127.0.0.1`, 5 MB body cap):
 
 - `PUT /api/save/<edition>/<n>.json` — edited boxes → `editions/<edition>/boxes_raw/`
 - `POST /api/finalize` — rebuild the `web/` bundle slices
-- `POST /api/export` — patch the Flutter app's assets (pixel boxes →
-  fractions, word keys, marker spots)
+- `POST /api/export` — patch `editions/<edition>/page_boxes.json` +
+  `page_markers.json` (the pack inputs; next push rebuilds the packs)
 
 The reviewer's deliverable is `editions/<edition>/boxes_raw/` plus
 `editions/<edition>/corrections_log.jsonl` (one line per applied save).

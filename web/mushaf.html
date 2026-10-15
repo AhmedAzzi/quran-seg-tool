@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mushaf — read &amp; review</title>
+<title>المصحف — قراءة ومراجعة</title>
 <style>
   :root { --bg:#f4f1ea; --panel:#fff; --ink:#222; --border:#ccc;
           --accent:#0f7a4a; --gold:#b8860b; --sel:#e67700;
@@ -11,17 +11,20 @@
           --pass:#2f9e44; --fail:#e2483d; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--ink);
-         font-family:-apple-system,Segoe UI,Roboto,sans-serif;
+         font-family:-apple-system,"Segoe UI",Tahoma,Arial,"Noto Kufi Arabic","Amiri",sans-serif;
          display:flex; flex-direction:column; height:100vh; overflow:hidden; }
   header { flex:0 0 auto; padding:12px 16px 4px; text-align:center; }
   header h1 { font-size:1.05rem; margin:0 0 4px; }
   header p { margin:0; font-size:.8rem; opacity:.65; }
-  .main { flex:1; min-height:0; display:flex; }
-  .sidebar { width:320px; flex:0 0 auto; overflow-y:auto; padding:8px 0 12px 12px;
+  .main { flex:1; min-height:0; display:flex; gap:0; }
+  .sidebar { width:300px; flex:0 0 auto; overflow-y:auto; padding:8px 12px 12px;
              display:flex; flex-direction:column; gap:8px; }
+  .sidebar-l { padding:8px 8px 12px 12px; }
+  .sidebar-r { padding:8px 12px 12px 8px; }
   .sideblock { background:var(--panel); border:1px solid var(--border);
                border-radius:10px; padding:10px 12px; }
-  .sideblock h2 { font-size:.85rem; margin:0 0 8px; }
+  .sideblock h2 { font-size:.85rem; margin:0 0 8px; text-align:right; }
+  .sideblock { text-align:right; }
   .viewer { flex:1; min-width:0; display:flex; flex-direction:column; padding:8px 12px 12px 8px; }
   .stage-wrap { flex:1; min-height:0; display:flex; }
   #stage { flex:1; min-height:0; border:1px solid var(--border); border-radius:8px;
@@ -45,9 +48,9 @@
   #verdict.unknown { color:var(--ink); background:var(--border); }
   .toolbar { display:flex; flex-direction:column; gap:8px; padding:0; align-items:stretch; }
   .toolbar button { width:100%; }
-  #info { font-size:.85rem; min-height:1.4em; padding:2px 4px; flex:0 0 auto; }
-  #progress, #stats { font-size:.8rem; opacity:.75; padding:2px 0; }
-  #oraclebox { font-size:.8rem; padding-top:4px; }
+  #info { font-size:.85rem; min-height:1.4em; padding:2px 4px; flex:0 0 auto; text-align:right; direction:rtl; }
+  #progress, #stats { font-size:.8rem; opacity:.75; padding:2px 0; text-align:right; }
+  #oraclebox { font-size:.8rem; padding-top:4px; text-align:right; }
   #oraclebox .fail-line { color:var(--fail); }
   .hint { font-size:.78rem; opacity:.6; }
   #wordpanel .ar { font-size:2rem; line-height:2.6rem; text-align:right; }
@@ -58,6 +61,9 @@
   .ayahtext { font-size:1rem; line-height:2rem; text-align:right; background:var(--bg);
     border-radius:8px; padding:8px 10px; margin-top:6px; }
   kbd { border:1px solid var(--border); border-radius:4px; padding:0 4px; font-size:.75rem; background:var(--panel); }
+  @media (max-width: 1200px) {
+    .sidebar { width:270px; }
+  }
   @media (max-width: 820px) {
     body { height:auto; overflow:auto; }
     .main { flex-direction:column; overflow:visible; }
@@ -69,77 +75,79 @@
 </head>
 <body>
 <header>
-  <h1>Mushaf — read &amp; review</h1>
-  <p>Tap a box to select it and see the word · <b>Save ✓ Apply to app</b> saves, applies and exports in one click (needs <kbd>web/serve.bat</kbd> running)</p>
+  <h1>المصحف — قراءة ومراجعة</h1>
+  <p>انقر على صندوق لتحديده وعرض الكلمة · زر <b>حفظ ✓ تطبيق في التطبيق</b> يحفظ ويطبّق ويصدّر بنقرة واحدة (يتطلب تشغيل <kbd>web/serve.bat</kbd>)</p>
 </header>
 <div class="main">
-<aside class="sidebar">
+<aside class="sidebar sidebar-r">
   <div class="sideblock">
-    <h2>Data</h2>
-    <div><span class="hint">server: <span id="srvdot">…</span></span></div>
-    <div id="loadStatus">Starting…</div>
+    <h2>البيانات</h2>
+    <div><span class="hint">الخادم: <span id="srvdot">…</span></span></div>
+    <div id="loadStatus">جارٍ البدء…</div>
   </div>
   <div class="sideblock">
     <div class="row nav">
-      <select id="edSel" title="Mushaf edition">
-        <option value="warsh">Warsh</option>
-        <option value="hafs">Hafs</option>
-        <option value="asbahani">Asbahani</option>
+      <select id="edSel" title="طبعة المصحف">
+        <option value="warsh">ورش</option>
+        <option value="hafs">حفص</option>
+        <option value="asbahani">الأصبهاني</option>
       </select>
-      <button id="btnNextUncorr" class="nav" title="Jump to next page with no recorded correction">Next new ⏭</button>
+      <button id="btnNextUncorr" class="nav" title="انتقل إلى الصفحة التالية التي بلا تصحيح مسجّل">التالي الجديد ⏭</button>
     </div>
     <div class="row nav" style="margin-top:8px">
-      <button id="btnPrev">◀ Prev</button>
-      <button id="btnNext">Next ▶</button>
-      <select id="pageSel" title="Jump to page"></select>
+      <button id="btnPrev">السابق ▶</button>
+      <button id="btnNext">◀ التالي</button>
+      <select id="pageSel" title="انتقل إلى صفحة"></select>
     </div>
     <div id="progress"></div>
     <div class="row" id="reviewNav" style="margin-top:8px">
-      <button id="btnNextFail" class="nav" title="Jump to next oracle-FAIL page">Next FAIL ⏭</button>
-      <span id="verdict" class="unknown">no data</span>
+      <button id="btnNextFail" class="nav" title="انتقل إلى الصفحة الراسبة التالية في المدقق">الراسبة التالية ⏭</button>
+      <span id="verdict" class="unknown">لا بيانات</span>
     </div>
     <div class="row" style="margin-top:8px">
-      <label class="hint"><input type="checkbox" id="showBoxes" checked> show boxes</label>
+      <label class="hint"><input type="checkbox" id="showBoxes" checked> إظهار الصناديق</label>
     </div>
   </div>
   <div class="sideblock" id="readBlocks">
     <div id="wordpanel">
-      <h2>Word</h2>
+      <h2>الكلمة</h2>
       <div id="wordbody"></div>
     </div>
-  </div>
-  <div class="sideblock" id="reviewBlocks">
-    <div id="stats"></div>
-    <div id="oraclebox"></div>
-    <div class="toolbar" style="margin-top:8px">
-      <button id="btnSplit" disabled>Split selected at last click</button>
-      <button id="btnMergeLeft" disabled>Merge with left neighbor</button>
-      <button id="btnToggleType" disabled>Toggle word/marker/bismillah</button>
-      <button id="btnClearFlag" disabled>Clear flag</button>
-      <button id="btnClearAllFlags">Clear all page flags</button>
-      <button id="btnDelete" disabled>Delete box</button>
-      <button id="btnAdd" class="modebtn" title="Draw a missing box: toggle on, then drag a rectangle on the page (or hold Shift and drag anytime). Shortcut: A">Add box: off</button>
-      <div class="row" style="margin-top:8px">
-        <button id="btnMapStart" title="Anchor the selected box to a word — following boxes continue sequentially">Map box…</button>
-        <button id="btnMapClear" disabled title="Drop the manual anchors (back to page-start mapping)">Clear anchor</button>
-      </div>
-      <div id="mapline" class="hint" style="margin-top:6px"></div>
-      <div id="mappick" style="display:none; margin-top:6px">
-        <select id="mapSel" style="width:100%; padding:7px; border:1px solid var(--border); border-radius:8px; font-size:.85rem"></select>
-        <div class="row" style="margin-top:6px">
-          <button id="btnMapApply" class="primary">Apply Box 0 → word</button>
-        </div>
-        <div id="mappreview" class="hint" style="margin-top:6px"></div>
-      </div>
-      <button id="btnSave" class="primary" title="One click: save boxes, rebuild verdicts and patch the Flutter app's bundled assets (needs serve.py running)">Save ✓ Apply to app</button>
-    </div>
-    <p class="hint">Tap a box to select · tap again inside it to set a split point · drag a rectangle to add a missing box (toggle <b>Add box</b> or hold <kbd>Shift</kbd>) · <kbd>◀</kbd><kbd>▶</kbd> change page.</p>
   </div>
 </aside>
 <section class="viewer">
   <div id="info"></div>
   <div class="stage-wrap"><div id="stage"><canvas id="canvas"></canvas></div></div>
 </section>
+<aside class="sidebar sidebar-l">
+  <div class="sideblock" id="reviewBlocks">
+    <div id="stats"></div>
+    <div id="oraclebox"></div>
+    <div class="toolbar" style="margin-top:8px">
+      <button id="btnSplit" disabled>تقسيم المحدد عند آخر نقرة</button>
+      <button id="btnMergeLeft" disabled>دمج مع الصندوق السابق</button>
+      <button id="btnToggleType" disabled>تبديل كلمة/علامة/بسملة</button>
+      <button id="btnClearFlag" disabled>مسح العلامة</button>
+      <button id="btnClearAllFlags">مسح كل علامات الصفحة</button>
+      <button id="btnDelete" disabled>حذف الصندوق</button>
+      <button id="btnAdd" class="modebtn" title="ارسم صندوقًا ناقصًا: فعّل ثم اسحب مستطيلًا على الصفحة (أو اضغط Shift واسحب في أي وقت). الاختصار: A">إضافة صندوق: متوقفة</button>
+      <div class="row" style="margin-top:8px">
+        <button id="btnMapStart" title="ثبّت الصندوق المحدد على كلمة — الصناديق التالية تكمل بالتتابع">ربط صندوق…</button>
+        <button id="btnMapClear" disabled title="إسقاط التثبيتات اليدوية (عودة للربط من بداية الصفحة)">مسح التثبيت</button>
+      </div>
+      <div id="mapline" class="hint" style="margin-top:6px"></div>
+      <div id="mappick" style="display:none; margin-top:6px">
+        <select id="mapSel" style="width:100%; padding:7px; border:1px solid var(--border); border-radius:8px; font-size:.85rem"></select>
+        <div class="row" style="margin-top:6px">
+          <button id="btnMapApply" class="primary">تثبيت صندوق 0 ← كلمة</button>
+        </div>
+        <div id="mappreview" class="hint" style="margin-top:6px"></div>
+      </div>
+      <button id="btnSave" class="primary" title="نقرة واحدة: حفظ الصناديق وإعادة بناء النتائج وترقيع أصول تطبيق Flutter (يتطلب تشغيل serve.py)">حفظ ✓ تطبيق في التطبيق</button>
+    </div>
+    <p class="hint">انقر صندوقًا لتحديده · انقر داخله مرة أخرى لتحديد نقطة التقسيم · اسحب مستطيلًا لإضافة صندوق ناقص (فعّل <b>إضافة صندوق</b> أو اضغط <kbd>Shift</kbd>) · الأسهم <kbd>◀</kbd><kbd>▶</kbd>: السابق/التالي، <kbd>▲</kbd><kbd>▼</kbd>: سطر أعلى/أسفل — وتغيّر الصفحة بدون تحديد.</p>
+  </div>
+</aside>
 </div>
 
 <script>
@@ -220,7 +228,7 @@ async function loadEdition(ed) {
   anchorDirty = {};
   loadAnchorsLocal();
   oracle = null;
-  wordbody.innerHTML = '<p class="hint">Tap a word on the page.</p>';
+  wordbody.innerHTML = '<p class="hint">انقر على كلمة في الصفحة.</p>';
   info.textContent = '';
   try {
     await loadScript(ED + '/manifest.js');
@@ -233,7 +241,7 @@ async function loadEdition(ed) {
     } catch (e) { oracle = null; }
     finishIndex();
   } catch (err) {
-    loadStatus.textContent = 'Could not load ' + ED + ' data (' + esc(err.message) + '). ';
+    loadStatus.textContent = 'تعذّر تحميل بيانات ' + ED + ' (' + esc(err.message) + '). ';
   }
   checkServerDot(); // non-blocking; enables one-click save when serve.py runs
 }
@@ -254,9 +262,9 @@ async function serverUp() {
 async function checkServerDot() {
   const el = $('srvdot');
   if (await serverUp()) {
-    if (el) el.textContent = '● on — Save writes directly, no dialogs';
+    if (el) el.textContent = '● متصل — الحفظ يكتب مباشرة بدون نوافذ';
   } else if (el) {
-    el.textContent = '○ off — start web/serve.bat';
+    el.textContent = '○ غير متصل — شغّل web/serve.bat';
   }
 }
 async function saveViaServer(edited) {
@@ -310,14 +318,14 @@ async function exportViaServer(pages) {
 }
 function refreshResStatus() {
   loadStatus.textContent = pages.length
-    ? `${pages.length} pages · oracle:${oracle ? ' ✓' : ' ○'}`
-    : 'No pages — run the bundle builder next to this file.';
+    ? `${pages.length} صفحة · المدقق:${oracle ? ' ✓' : ' ○'}`
+    : 'لا صفحات — شغّل باني الحزمة الموجود بجانب هذا الملف.';
 }
 function markPageOptions() {
   const sel = $('pageSel');
   for (const o of sel.options) {
     const n = parseInt(o.value, 10);
-    o.textContent = 'Page ' + n + (corrected[n] ? ' ✓' : '');
+    o.textContent = 'صفحة ' + n + (corrected[n] ? ' ✓' : '');
   }
 }
 function finishIndex() {
@@ -325,7 +333,7 @@ function finishIndex() {
   sel.innerHTML = '';
   for (const p of pages) {
     const o = document.createElement('option');
-    o.value = p.num; o.textContent = 'Page ' + p.num;
+    o.value = p.num; o.textContent = 'صفحة ' + p.num;
     sel.appendChild(o);
   }
   markPageOptions();
@@ -351,7 +359,7 @@ async function loadPage(i) {
   const showImg = () => {
     img = new Image();
     img.onload = done;
-    img.onerror = () => { if (my === loadGen) info.textContent = 'Page image missing: ../editions/' + ED + '/pages/' + p.num + '.jpg'; };
+    img.onerror = () => { if (my === loadGen) info.textContent = 'صورة الصفحة مفقودة: ../editions/' + ED + '/pages/' + p.num + '.jpg'; };
     img.src = '../editions/' + ED + '/pages/' + p.num + '.jpg';
   };
   if (p.revTok) { tokens = p.revTok; sortTokens(); showImg(); return; }
@@ -366,7 +374,7 @@ async function loadPage(i) {
     p.revTok = tokens;
   } catch (err) {
     tokens = [];
-    info.textContent = 'Tokens missing: ' + ED + '/review/' + p.num + '.js';
+    info.textContent = 'الصناديق مفقودة: ' + ED + '/review/' + p.num + '.js';
   }
   // Review boxes carry geometry only: preload the read (final) bundle so a
   // tap can show the overlapping word's text (see readMatchFor).
@@ -491,7 +499,16 @@ canvas.addEventListener('click', e => {
   const r = canvas.getBoundingClientRect();
   const cx = (e.clientX - r.left) / scale, cy = (e.clientY - r.top) / scale;
   const hit = tokens.findIndex(t => cx >= t.x0 && cx <= t.x1 && cy >= t.y0 && cy <= t.y1);
-  if (hit === -1) return;
+  if (hit === -1) {
+    // نقرة على مساحة فارغة: إلغاء تحديد الصندوق
+    if (selectedIdx !== null) {
+      selectedIdx = null; lastClickX = null;
+      updateInfo();
+      wordbody.innerHTML = '<p class="hint">انقر على كلمة في الصفحة.</p>';
+      draw();
+    }
+    return;
+  }
   if (hit === selectedIdx) lastClickX = Math.round(cx);
   else { selectedIdx = hit; lastClickX = null; }
   updateInfo();
@@ -499,6 +516,17 @@ canvas.addEventListener('click', e => {
   draw();
 });
 $('showBoxes').addEventListener('change', draw);
+$('stage').addEventListener('click', e => {
+  // نقرة على خلفية العرض خارج الصفحة: إلغاء التحديد أيضًا
+  // (نقرات الصناديق هدفها canvas فتُتجاهل هنا)
+  if (e.target !== $('stage')) return;
+  if (selectedIdx !== null) {
+    selectedIdx = null; lastClickX = null;
+    updateInfo();
+    wordbody.innerHTML = '<p class="hint">انقر على كلمة في الصفحة.</p>';
+    draw();
+  }
+});
 
 // ============================== word panel ==============================
 // Marker tokens carry geometry only (no key/arabic), but they sit in reading
@@ -558,8 +586,8 @@ function showMarker(t) {
     `<div class="ar" dir="rtl" lang="ar">۝${num ? ' ' + esc(num) : ''}</div>` +
     (text
       ? `<div class="ayahtext" dir="rtl" lang="ar">${esc(text)}</div>`
-      : `<div class="hint">Ayah${ak ? ' ' + esc(ak) : ''} — full text unavailable.</div>`) +
-    (ak ? `<div><span class="chip">marker → ${esc(ak)}</span></div>` : '');
+      : `<div class="hint">الآية${ak ? ' ' + esc(ak) : ''} — النص الكامل غير متوفر.</div>`) +
+    (ak ? `<div><span class="chip">علامة: ${esc(ak)}</span></div>` : '');
 }
 function showToken(t) {
   // Ayah-end roundel: it owns no words, so it must NEVER resolve to a
@@ -577,7 +605,7 @@ function showToken(t) {
     headAr = spanDict[mapKey];
     const m = readMatchFor(t);
     if (m && m.arabic && m.arabic !== headAr)
-      staleNote = `<div class="note">final bundle shows “${esc(m.arabic)}” — drifted, anchor wins</div>`;
+      staleNote = `<div class="note">الحزمة النهائية تعرض “${esc(m.arabic)}” — هناك انزياح، والتثبيت هو المعتمد</div>`;
   } else {
     // review boxes carry geometry only: show the overlapping read word
     const m = t && readMatchFor(t);
@@ -586,7 +614,7 @@ function showToken(t) {
   if (!headAr && t && t.arabic) headAr = t.arabic;
   wordbody.innerHTML =
     `<div class="ar" dir="rtl" lang="ar">${esc(headAr)}</div>` +
-    (mapKey ? `<div><span class="chip">map: Box${wi} → ${esc(mapKey)}</span></div>` : '');
+    (mapKey ? `<div><span class="chip">الربط: صندوق ${wi} ← ${esc(mapKey)}</span></div>` : '');
   if (staleNote) wordbody.innerHTML += staleNote;
 }
 try {
@@ -617,16 +645,19 @@ function updateInfo() {
   btnClearFlag.disabled = !has;
   btnDelete.disabled = !has;
   if (!pages.length || pageIdx < 0) return;
-  if (has) {
+  if (has && tokens[selectedIdx]) {
     const t = tokens[selectedIdx];
-    info.innerHTML = `Page ${pages[pageIdx].num} token <b>#${selectedIdx}</b> — type:<b>${t.type}</b> box:[${t.x0},${t.y0},${t.x1},${t.y1}] w=${t.x1 - t.x0}` +
-      (t.flagged ? ' — <b style="color:var(--flagged)">flagged</b>' : '') +
-      (lastClickX !== null ? ` — split x=${lastClickX}` : '');
+    const typeAr = t.type === 'word' ? 'كلمة' : (t.type === 'marker' ? 'علامة' : (t.type === 'bismillah' ? 'بسملة' : t.type));
+    info.innerHTML = `صفحة ${pages[pageIdx].num} صندوق <b>#${selectedIdx}</b> — النوع:<b>${typeAr}</b> المربع:[${t.x0},${t.y0},${t.x1},${t.y1}] العرض=${t.x1 - t.x0}` +
+      (t.flagged ? ' — <b style="color:var(--flagged)">مُعلَّم</b>' : '') +
+      (lastClickX !== null ? ` — التقسيم x=${lastClickX}` : '');
+  } else {
+    info.textContent = `صفحة ${pages[pageIdx].num}`;
   }
 }
 function updateProgress() {
   progress.textContent = pages.length
-    ? `Page ${pageIdx + 1}/${pages.length} · corrected ${correctedCount()}/${pages.length} · edited ${editedCount()}`
+    ? `صفحة ${pageIdx + 1}/${pages.length} · مصحح ${correctedCount()}/${pages.length} · معدّل ${editedCount()}`
     : '';
 }
 function refreshChrome() {
@@ -638,33 +669,33 @@ function refreshChrome() {
   const f = tokens.filter(t => t.flagged).length;
   const m = tokens.filter(t => t.type === 'marker').length;
   const b = tokens.filter(t => t.type === 'bismillah').length;
-  stats.textContent = `Page ${p.num} · ${tokens.length} tokens (${tokens.length - m - b} word, ${m} marker, ${b} bismillah, ${f} flagged)${p.dirty ? ' · EDITED' : ''}`;
+  stats.textContent = `صفحة ${p.num} · ${tokens.length} صندوقًا (${tokens.length - m - b} كلمة، ${m} علامة، ${b} بسملة، ${f} مُعلَّم)${p.dirty ? ' · مُعدَّل' : ''}`;
   updateProgress();
   const rep = oracleFor(p);
   const verdict = $('verdict'), oraclebox = $('oraclebox');
   if (!rep) {
-    verdict.className = 'unknown'; verdict.textContent = 'no oracle';
+    verdict.className = 'unknown'; verdict.textContent = 'لا مدقق';
     oraclebox.innerHTML = '';
   } else if (rep.page_ok) {
-    verdict.className = 'pass'; verdict.textContent = 'oracle PASS ✓';
+    verdict.className = 'pass'; verdict.textContent = 'المدقق ناجح ✓';
     oraclebox.innerHTML = '';
   } else {
-    verdict.className = 'fail'; verdict.textContent = 'oracle FAIL';
+    verdict.className = 'fail'; verdict.textContent = 'المدقق راسب';
     let html = '';
     (rep.groups || []).forEach(g => {
       if (g.edge) {
-        html += `<div>edge spot-check ayahs ${JSON.stringify(g.ayahs)} @y=${JSON.stringify(g.y)}</div>`;
+        html += `<div>فحص الحافة للآيات ${JSON.stringify(g.ayahs)} عند y=${JSON.stringify(g.y)}</div>`;
       } else if (g.ok === false) {
         const ay = g.ayahs && g.ayahs.length ? `${JSON.stringify(g.ayahs[0])}..${JSON.stringify(g.ayahs[g.ayahs.length - 1])}` : '?';
-        html += `<div class="fail-line">◈ ayahs ${ay} @y=${JSON.stringify(g.y)}: ${g.n} boxes vs ${g.exp} expected${g.fail ? ' — ' + g.fail : ''}</div>`;
+        html += `<div class="fail-line">◈ الآيات ${ay} عند y=${JSON.stringify(g.y)}: ${g.n} صندوقًا مقابل ${g.exp} متوقعًا${g.fail ? ' — ' + g.fail : ''}</div>`;
       }
     });
     const skips = [];
     (rep.groups || []).forEach(g => (g.skipped || []).forEach(s => skips.push(JSON.stringify(s))));
-    if (skips.length) html += `<div class="fail-line">△ missing marker for ayah ${skips.join(', ')} — add the roundel box</div>`;
+    if (skips.length) html += `<div class="fail-line">△ علامة ناقصة للآية ${skips.join('، ')} — أضف صندوق الدائرة</div>`;
     if (rep.align && rep.align !== 'ok' && rep.align !== 'ok:expanded')
-      html += `<div class="fail-line">△ alignment: ${rep.align}</div>`;
-    if (!html) html = '<div class="fail-line">counts mismatch — see stats vs oracle.</div>';
+      html += `<div class="fail-line">△ المحاذاة: ${rep.align}</div>`;
+    if (!html) html = '<div class="fail-line">العدد غير متطابق — قارن الإحصاء مع المدقق.</div>';
     oraclebox.innerHTML = html;
   }
   if (spanWords.length) buildAnchorMap();
@@ -674,7 +705,7 @@ function refreshChrome() {
 btnSplit.onclick = () => {
   if (selectedIdx === null || lastClickX === null) return;
   const t = tokens[selectedIdx];
-  if (lastClickX <= t.x0 || lastClickX >= t.x1) { info.textContent = 'Split point must be inside the box.'; return; }
+  if (lastClickX <= t.x0 || lastClickX >= t.x1) { info.textContent = 'يجب أن تكون نقطة التقسيم داخل الصندوق.'; return; }
   tokens.splice(selectedIdx, 1, { ...t, x0: lastClickX, flagged: false }, { ...t, x1: lastClickX, flagged: false });
   sortTokens();
   selectedIdx = null; lastClickX = null; persistTokens(); refreshChrome();
@@ -700,10 +731,10 @@ btnClearFlag.onclick = () => {
 $('btnClearAllFlags').onclick = () => {
   if (!pages.length || pageIdx < 0) return;
   const n = tokens.filter(t => t.flagged).length;
-  if (!n) { info.textContent = 'No flagged boxes on this page.'; return; }
+  if (!n) { info.textContent = 'لا صناديق مُعلَّمة في هذه الصفحة.'; return; }
   tokens.forEach(t => { t.flagged = false; });
   persistTokens(); refreshChrome();
-  info.textContent = `Cleared ${n} flag(s) on page ${pages[pageIdx].num}. Press Save ✓ Apply to app to record the correction.`;
+  info.textContent = `تم مسح ${n} علامة في صفحة ${pages[pageIdx].num}. اضغط «حفظ ✓» لتسجيل التصحيح.`;
 };
 btnDelete.onclick = () => {
   if (selectedIdx === null) return;
@@ -717,11 +748,11 @@ btnDelete.onclick = () => {
 const btnAdd = $('btnAdd');
 function setAddMode(on) {
   addMode = !!on;
-  btnAdd.textContent = 'Add box: ' + (addMode ? 'ON — drag on page' : 'off');
+  btnAdd.textContent = 'إضافة صندوق: ' + (addMode ? 'تعمل — اسحب على الصفحة' : 'متوقفة');
   btnAdd.classList.toggle('active', addMode);
   canvas.style.touchAction = addMode ? 'none' : 'manipulation';
   if (!addMode) { addDraft = null; dragStart = null; draw(); }
-  else info.textContent = 'Add-box ON: drag a rectangle around the missing word, then Save ✓ Apply to app.';
+  else info.textContent = 'وضع الإضافة يعمل: اسحب مستطيلًا حول الكلمة الناقصة، ثم اضغط «حفظ ✓».';
 }
 btnAdd.onclick = () => setAddMode(!addMode);
 function canvasPt(e) {
@@ -763,7 +794,7 @@ canvas.addEventListener('pointerup', () => {
   selectedIdx = tokens.indexOf(t); lastClickX = null;
   suppressClick = true; // swallow the click that follows pointerup
   persistTokens(); refreshChrome();
-  info.textContent = `Added word box #${selectedIdx} [${t.x0},${t.y0},${t.x1},${t.y1}] — Toggle type if it is a marker/bismillah, then Save ✓ Apply to app.`;
+  info.textContent = `تمت إضافة صندوق كلمة رقم #${selectedIdx} [${t.x0},${t.y0},${t.x1},${t.y1}] — بدّل النوع إذا كان علامة/بسملة، ثم اضغط «حفظ ✓».`;
   draw();
 });
 canvas.addEventListener('pointercancel', () => {
@@ -840,16 +871,16 @@ function updateMapLine() {
   const boxes = wordBoxes();
   const an = pageAnchors.slice().sort((a, b) => a.box - b.box);
   $('btnMapClear').disabled = !an.length;
-  let s = boxes.length ? `${boxes.length} word box(es)` : 'No word boxes on this page.';
-  if (an.length) s += ' · anchors: ' + an.map(a => `Box${a.box}→${a.key}`).join(', ');
-  else s += ` · Box 0 auto → ${spanFirst || 'page start'}`;
+  let s = boxes.length ? `${boxes.length} صندوق كلمة` : 'لا صناديق كلمات في هذه الصفحة.';
+  if (an.length) s += ' · التثبيتات: ' + an.map(a => `صندوق${a.box}←${a.key}`).join('، ');
+  else s += ` · صندوق 0 تلقائي ← ${spanFirst || 'بداية الصفحة'}`;
   const mapped = anchorMap.filter(k => k !== undefined);
   if (boxes.length && anchorMap.length) {
-    s += ` · ${mapped.length}/${boxes.length} mapped` +
+    s += ` · ${mapped.length}/${boxes.length} مربوط` +
       (mapped.length ? ` (${mapped[0]}..${mapped[mapped.length - 1]})` : '') +
-      (mapped.length < boxes.length ? `, ${boxes.length - mapped.length} unmapped` : ', all covered');
+      (mapped.length < boxes.length ? `، ${boxes.length - mapped.length} غير مربوط` : '، الكل مغطى');
   }
-  if (anchorDirty[ED + ':' + num] !== undefined) s += ' · unsynced — Save to apply';
+  if (anchorDirty[ED + ':' + num] !== undefined) s += ' · غير متزامن — احفظ للتطبيق';
   el.textContent = s;
 }
 async function ensureSpan(ed, num) {
@@ -929,7 +960,7 @@ function setAnchor(num, box, key) {
   buildAnchorMap(); updateMapLine(); draw();
   pushAnchor(ED, num, box, key).then(ok => {
     if (ok) delete anchorDirty[ED + ':' + num];
-    else info.textContent = 'Anchor kept locally — start web/serve.bat and press Save to sync it.';
+    else info.textContent = 'التثبيت محفوظ محليًا — شغّل web/serve.bat واضغط حفظ لمزامنته.';
     updateMapLine();
   });
 }
@@ -941,7 +972,7 @@ function clearAnchors(num) {
   buildAnchorMap(); updateMapLine(); draw();
   pushClearAll(ED, num).then(ok => {
     if (ok) delete anchorDirty[ED + ':' + num];
-    else info.textContent = 'Clear kept locally — start web/serve.bat and press Save to sync it.';
+    else info.textContent = 'المسح محفوظ محليًا — شغّل web/serve.bat واضغط حفظ لمزامنته.';
     updateMapLine();
   });
 }
@@ -959,7 +990,7 @@ function fillPicker() {
     const inSpan = spanFirst && spanLast &&
       cmpKey(w.key, spanFirst) >= 0 && cmpKey(w.key, spanLast) <= 0;
     o.value = w.key;
-    o.textContent = w.key + ' — ' + String(w.arabic || '').slice(0, 28) + (inSpan ? '' : ' (outside page span)');
+    o.textContent = w.key + ' — ' + String(w.arabic || '').slice(0, 28) + (inSpan ? '' : ' (خارج نطاق الصفحة)');
     sel.appendChild(o);
   }
   if (cur) sel.value = cur;
@@ -971,11 +1002,11 @@ function previewPick() {
   const hypo = pageAnchors.filter(a => a.box !== pickBox).concat([{ box: pickBox, key }]);
   const m = composeMap(n, hypo);
   const mapped = m.filter(k => k !== undefined);
-  let s = `Box ${pickBox} → ${key}` +
-    (mapped.length ? ` … → ${mapped[mapped.length - 1]} (${mapped.length}/${n} mapped)` : ' (nothing maps — past span end?)');
-  if (mapped.length < n) s += ` — ${n - mapped.length} box(es) unmapped (will flag extra-box).`;
+  let s = `صندوق ${pickBox} ← ${key}` +
+    (mapped.length ? ` … ← ${mapped[mapped.length - 1]} (${mapped.length}/${n} مربوط)` : ' (لا شيء مربوط — بعد نهاية النطاق؟)');
+  if (mapped.length < n) s += ` — ${n - mapped.length} صندوقًا غير مربوط (سيُعلَّم كزائد).`;
   const others = pageAnchors.filter(a => a.box !== pickBox);
-  if (others.length) s += ` · keeps: ${others.map(a => `Box${a.box}→${a.key}`).join(', ')}`;
+  if (others.length) s += ` · يُحافَظ على: ${others.map(a => `صندوق${a.box}←${a.key}`).join('، ')}`;
   $('mappreview').textContent = s;
 }
 $('btnMapStart').onclick = async () => {
@@ -987,11 +1018,11 @@ $('btnMapStart').onclick = async () => {
   if (selectedIdx !== null && tokens[selectedIdx] && tokens[selectedIdx].type === 'word')
     pickBox = wordBoxes().indexOf(tokens[selectedIdx]);
   if (pickBox < 0) pickBox = 0;
-  $('btnMapApply').textContent = `Apply Box ${pickBox} → word`;
+  $('btnMapApply').textContent = `تثبيت صندوق ${pickBox} ← كلمة`;
   panel.style.display = 'block';
-  $('mappreview').textContent = 'Loading page words…';
+  $('mappreview').textContent = 'جارٍ تحميل كلمات الصفحة…';
   if (!(await ensureSpan(ED, pages[pageIdx].num))) {
-    $('mappreview').textContent = 'Word list needs the local server — double-click web/serve.bat, then retry.';
+    $('mappreview').textContent = 'قائمة الكلمات تحتاج الخادم المحلي — انقر نقرًا مزدوجًا على web/serve.bat ثم أعد المحاولة.';
     $('mapSel').innerHTML = '';
     return;
   }
@@ -1002,7 +1033,7 @@ $('btnMapApply').onclick = () => {
   if (pageIdx < 0 || !$('mapSel').value) return;
   setAnchor(pages[pageIdx].num, pickBox, $('mapSel').value);
   $('mappick').style.display = 'none';
-  info.textContent = `Box ${pickBox} → ${$('mapSel').value} — following boxes map sequentially. Save to apply.`;
+  info.textContent = `صندوق ${pickBox} ← ${$('mapSel').value} — الصناديق التالية تُربط بالتتابع. احفظ للتطبيق.`;
 };
 $('btnMapClear').onclick = () => {
   if (pageIdx < 0 || !pageAnchors.length) return;
@@ -1012,12 +1043,12 @@ $('btnMapClear').onclick = () => {
     const b = wordBoxes().indexOf(tokens[selectedIdx]);
     if (b >= 0 && pageAnchors.some(a => a.box === b)) {
       setAnchor(num, b, null);
-      info.textContent = `Box ${b} anchor removed — following boxes fall back.`;
+      info.textContent = `تمت إزالة تثبيت صندوق ${b} — الصناديق التالية تعود للوضع السابق.`;
       return;
     }
   }
   clearAnchors(num);
-  info.textContent = 'All page anchors cleared — back to page-start mapping.';
+  info.textContent = 'تم مسح كل تثبيتات الصفحة — عودة للربط من بداية الصفحة.';
 };
 // ============================== ONE-BUTTON save → apply → export ==============================
 // Single click does the whole pipeline for every touched page:
@@ -1031,19 +1062,19 @@ $('btnSave').onclick = async () => {
   const edited = pages.filter(p => p.dirty && p.revTok);
   const anchPages = Object.keys(anchorDirty).map(k => ({ ed: k.split(':')[0], n: parseInt(k.split(':')[1], 10) }))
     .filter(x => x.ed === ED && !isNaN(x.n));
-  if (!edited.length && !anchPages.length) { info.textContent = 'Nothing edited yet.'; return; }
+  if (!edited.length && !anchPages.length) { info.textContent = 'لا تعديلات بعد.'; return; }
   await checkServerDot(); // awaited: SERVER_CAPS must be fresh, not boot-era
   if (!SERVER_CAPS || !SERVER_CAPS.finalize || !SERVER_CAPS.export) {
     info.textContent = !SERVER_CAPS
-      ? 'No local server running — double-click web/serve.bat, then press Save again.'
-      : 'Your server is outdated and cannot apply/export. Ctrl+C the server window, double-click web/serve.bat again, then press Save again — no edits lost.';
+      ? 'لا يوجد خادم محلي — انقر نقرًا مزدوجًا على web/serve.bat ثم اضغط حفظ مجددًا.'
+      : 'الخادم قديم ولا يدعم التطبيق/التصدير. أوقف نافذة الخادم بـ Ctrl+C ثم شغّل web/serve.bat مجددًا واضغط حفظ — لن تضيع تعديلاتك.';
     return;
   }
   // 1) boxes
-  info.textContent = `Saving ${edited.length} page(s)…`;
+  info.textContent = `جارٍ حفظ ${edited.length} صفحة…`;
   const nSrv = edited.length ? await saveViaServer(edited) : 0;
   if (edited.length && nSrv !== edited.length) {
-    info.textContent = `Saved ${nSrv}/${edited.length} via server, then it stopped responding — retry Save.`;
+    info.textContent = `تم حفظ ${nSrv}/${edited.length} عبر الخادم ثم توقف عن الاستجابة — أعد المحاولة.`;
     return;
   }
   // 2) anchors ride along (mapping-only changes need no box edits)
@@ -1057,7 +1088,7 @@ $('btnSave').onclick = async () => {
   // 3+4) finalize + export the exact touched pages in one go
   const nums = [...new Set([...edited.map(p => p.num), ...anchPages.map(x => x.n)])]
     .sort((a, b) => a - b);
-  info.textContent = `Saved. Applying + exporting ${nums.join(', ')} to the app…`;
+  info.textContent = `تم الحفظ. جارٍ التطبيق والتصدير للصفحات ${nums.join('، ')} إلى التطبيق…`;
   try {
     await finalizeViaServer(nums);
     const j = await exportViaServer(nums);
@@ -1078,23 +1109,23 @@ $('btnSave').onclick = async () => {
     const res = j.pages || {};
     const lines = nums.map(n => {
       const r = res[String(n)] || {};
-      if (!r.ok) return `p${n}: FAILED — ${r.error || '?'}`;
+      if (!r.ok) return `صفحة${n}: فشل — ${r.error || '?'}`;
       const warn = (r.warnings || []).length ? ` (${r.warnings.join('; ')})` : '';
-      return `p${n}: ${r.boxes} boxes, ${r.markers} markers${warn}`;
+      return `صفحة${n}: ${r.boxes} صندوقًا، ${r.markers} علامة${warn}`;
     });
     const okCount = nums.filter(n => (res[String(n)] || {}).ok).length;
-    info.innerHTML = `Applied to app ✓ — ${okCount}/${nums.length} page(s)` +
-      (j.backup ? `<br>Backup: ${esc(j.backup)}` : '') +
+    info.innerHTML = `تم التطبيق في التطبيق ✓ — ${okCount}/${nums.length} صفحة` +
+      (j.backup ? `<br>نسخة احتياطية: ${esc(j.backup)}` : '') +
       `<br>` + lines.map(esc).join('<br>') +
-      (anchFail.length ? `<br>Anchor NOT synced for p${anchFail.join(', p')} — retry Save.` : '') +
-      `<br>Review the page above — boxes and badges are fresh. Rebuild the app (flutter run) to see it on-device.`;
+      (anchFail.length ? `<br>التثبيت لم يُزامَن للصفحة ${anchFail.join('، ')} — أعد الحفظ.` : '') +
+      `<br>راجع الصفحة أعلاه — الصناديق والشارات محدّثة. أعد بناء التطبيق (flutter run) لرؤيتها على الجهاز.`;
   } catch (err) {
     if (err && err.message === 'OUTDATED_SERVER')
-      info.textContent = 'Boxes saved, but your server is outdated. ' +
-        'Ctrl+C the server window, double-click web/serve.bat again, then press Save once more — no edits lost.';
+      info.textContent = 'تم حفظ الصناديق لكن الخادم قديم. ' +
+        'أوقف نافذة الخادم بـ Ctrl+C ثم شغّل web/serve.bat مجددًا واضغط حفظ مرة أخرى — لن تضيع تعديلاتك.';
     else
-      info.textContent = 'Saved boxes, but apply/export failed (' + esc(err.message) +
-        ') — is web/serve.bat still running? Retry Save.';
+      info.textContent = 'تم حفظ الصناديق لكن التطبيق/التصدير فشل (' + esc(err.message) +
+        ') — هل web/serve.bat ما زال يعمل؟ أعد المحاولة.';
   }
 };
 $('btnNextFail').onclick = () => {
@@ -1104,7 +1135,7 @@ $('btnNextFail').onclick = () => {
     const rep = oracleFor(pages[i]);
     if (rep && !rep.page_ok) { loadPage(i); return; }
   }
-  info.textContent = oracle ? 'No FAIL pages — all pass ✓' : 'Load the oracle report first.';
+  info.textContent = oracle ? 'لا صفحات راسبة — الكل ناجح ✓' : 'حمّل تقرير المدقق أولًا.';
 };
 $('btnNextUncorr').onclick = () => {
   if (!pages.length) return;
@@ -1113,7 +1144,7 @@ $('btnNextUncorr').onclick = () => {
     const i = (start + k) % pages.length;
     if (!corrected[pages[i].num]) { loadPage(i); return; }
   }
-  info.textContent = 'All pages corrected ✓ — nothing new.';
+  info.textContent = 'كل الصفحات مصححة ✓ — لا جديد.';
 };
 // ============================== nav + boot ==============================
 $('btnPrev').onclick = () => loadPage(pageIdx - 1);
@@ -1122,10 +1153,76 @@ $('pageSel').onchange = e => {
   const i = pages.findIndex(p => p.num === parseInt(e.target.value, 10));
   if (i >= 0) loadPage(i);
 };
+function stepVertical(dir) {
+  // انتقال عمودي: السطر المجاور مباشرة ثم أقرب صندوق أفقيًا
+  if (selectedIdx === null || !tokens[selectedIdx]) return;
+  const boxes = [];
+  tokens.forEach((t, idx) => { if (tappable(t)) boxes.push({ t, idx }); });
+  if (!boxes.length) return;
+  // عتبة من وسيط ارتفاع الصناديق: تتحمل اهتزاز نفس السطر ولا تدمج سطورًا متجاورة
+  const hs = boxes.map(b => b.t.y1 - b.t.y0).sort((a, b) => a - b);
+  const hMed = hs[Math.floor(hs.length / 2)] || 10;
+  const tol = Math.max(8, hMed * 0.4);
+  const lines = []; // [{cy, n, idx:[]}] مرتبة من أعلى لأسفل
+  for (const b of boxes) {
+    const cy = (b.t.y0 + b.t.y1) / 2;
+    const L = lines[lines.length - 1];
+    if (L && Math.abs(cy - L.cy) <= tol) {
+      L.cy = (L.cy * L.n + cy) / (L.n + 1); L.n++;
+      L.idx.push(b.idx);
+    } else {
+      lines.push({ cy, n: 1, idx: [b.idx] });
+    }
+  }
+  const li = lines.findIndex(L => L.idx.includes(selectedIdx));
+  if (li < 0 || !lines[li + dir]) return; // لا سطر بعد: ثبات
+  const cur = tokens[selectedIdx];
+  const cx = (cur.x0 + cur.x1) / 2;
+  let best = -1, bestDx = Infinity;
+  for (const idx of lines[li + dir].idx) {
+    const t = tokens[idx];
+    const dx = Math.abs((t.x0 + t.x1) / 2 - cx);
+    if (dx < bestDx) { bestDx = dx; best = idx; }
+  }
+  if (best === -1) return;
+  selectedIdx = best; lastClickX = null;
+  updateInfo();
+  showToken(tokens[selectedIdx]);
+  draw();
+}
+function stepBox(dir) {
+  if (!tokens.length) return;
+  let i = (selectedIdx !== null && tokens[selectedIdx]) ? selectedIdx : (dir > 0 ? -1 : tokens.length);
+  for (let k = 0; k < tokens.length; k++) {
+    i += dir;
+    if (i < 0 || i >= tokens.length) return; // نهاية الصفحة: ثبات بدون التفاف
+    if (tappable(tokens[i])) break;
+  }
+  selectedIdx = i; lastClickX = null;
+  updateInfo();
+  showToken(tokens[selectedIdx]);
+  draw();
+}
 document.addEventListener('keydown', e => {
   if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
-  if (e.key === 'ArrowRight') loadPage(pageIdx + 1);
-  else if (e.key === 'ArrowLeft') loadPage(pageIdx - 1);
+  if (e.key === 'ArrowLeft') {
+    // صندوق محدد: الصندوق التالي · لا تحديد: الصفحة التالية (ضغطة = خطوة واحدة)
+    if (selectedIdx !== null && tokens[selectedIdx]) { e.preventDefault(); if (!e.repeat) stepBox(+1); }
+    else if (!e.repeat) loadPage(pageIdx + 1);
+  }
+  else if (e.key === 'ArrowRight') {
+    if (selectedIdx !== null && tokens[selectedIdx]) { e.preventDefault(); if (!e.repeat) stepBox(-1); }
+    else if (!e.repeat) loadPage(pageIdx - 1);
+  }
+  else if (e.key === 'ArrowDown') {
+    // صندوق محدد: سطر واحد لأسفل · لا تحديد: الصفحة التالية
+    if (selectedIdx !== null && tokens[selectedIdx]) { e.preventDefault(); if (!e.repeat) stepVertical(+1); }
+    else if (!e.repeat) loadPage(pageIdx + 1);
+  }
+  else if (e.key === 'ArrowUp') {
+    if (selectedIdx !== null && tokens[selectedIdx]) { e.preventDefault(); if (!e.repeat) stepVertical(-1); }
+    else if (!e.repeat) loadPage(pageIdx - 1);
+  }
   else if (e.key === 'a' || e.key === 'A') setAddMode(!addMode);
   else if (e.key === 'Escape' && addMode) setAddMode(false);
 });
