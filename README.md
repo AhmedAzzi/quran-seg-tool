@@ -37,3 +37,8 @@ The reviewer's deliverable is `editions/<edition>/boxes_raw/` plus
 - `editions/<edition>/` — per-edition workspace: `boxes_raw/` (edited boxes),
   `boxes_final/`, `pages/` (page scans), oracle/numbering/expectation JSONs,
   `corrections_log.jsonl`
+- `tool/build_pack.py` — assembles the downloadable `warsh.zip` / `hafs.zip` /
+  `asbahani.zip` packs (packs-v2 layout) from `editions/` over a pinned base
+  pack; run `python3 tool/build_pack.py <edition>`
+- `.github/workflows/build-packs.yml` — rebuilds + republishes all three
+  packs on the `packs` release on every push touching `editions/` or `web/`

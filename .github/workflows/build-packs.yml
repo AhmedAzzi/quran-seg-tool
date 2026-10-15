@@ -1,0 +1,46 @@
+name: build-packs
+
+# Rebuilds the on-demand mushaf packs (warsh/hafs/asbahani.zip) and
+# republishes them on the `packs` release, so every pushed segmentation
+# correction flows into the downloadable packs automatically.
+#
+# Pack inputs: editions/<ed>/ (pages + any of page_boxes.json,
+# page_markers.json, timings.json present there) over a pinned base pack
+# (quran.db, ayah_index.json, overlay_texts.json + fallbacks) fetched
+# from the Husn-el-Muslim packs-v2 release. See tool/build_pack.py.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'editions/**'
+      - 'web/**'
+      - 'tool/build_pack.py'
+      - '.github/workflows/build-packs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build packs
+        run: |
+          for ed in warsh hafs asbahani; do
+            python3 tool/build_pack.py "$ed" --out "$ed.zip"
+          done
+          ls -la ./*.zip
+
+      - name: Publish to packs release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! gh release view packs >/dev/null 2>&1; then
+            gh release create packs --title "Mushaf packs (auto-built)" \
+              --notes "On-demand mushaf edition packs, rebuilt automatically on every push (see build-packs workflow). Zip layout: data/quran.db + data/page_boxes.json + data/page_markers.json + data/timings.json + data/ayah_index.json + data/overlay_texts.json + pages/001-604.jpg at root."
+          fi
+          gh release upload packs warsh.zip hafs.zip asbahani.zip --clobber
