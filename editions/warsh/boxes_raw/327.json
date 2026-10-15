@@ -992,17 +992,9 @@
     "flagged": false
   },
   {
-    "x0": 630,
-    "y0": 1512,
-    "x1": 658,
-    "y1": 1608,
-    "type": "word",
-    "flagged": false
-  },
-  {
     "x0": 536,
     "y0": 1512,
-    "x1": 630,
+    "x1": 658,
     "y1": 1608,
     "type": "word",
     "flagged": false

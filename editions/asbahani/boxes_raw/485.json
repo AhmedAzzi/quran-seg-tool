@@ -520,17 +520,9 @@
     "flagged": false
   },
   {
-    "x0": 874,
-    "y0": 803,
-    "x1": 907,
-    "y1": 896,
-    "type": "word",
-    "flagged": false
-  },
-  {
     "x0": 795,
     "y0": 803,
-    "x1": 874,
+    "x1": 907,
     "y1": 896,
     "type": "word",
     "flagged": false
@@ -976,17 +968,17 @@
     "flagged": false
   },
   {
-    "x0": 491,
+    "x0": 545,
     "y0": 1442,
     "x1": 762,
     "y1": 1525,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
-    "x0": 437,
+    "x0": 491,
     "y0": 1442,
-    "x1": 491,
+    "x1": 545,
     "y1": 1525,
     "type": "word",
     "flagged": false
@@ -994,7 +986,7 @@
   {
     "x0": 283,
     "y0": 1442,
-    "x1": 437,
+    "x1": 491,
     "y1": 1525,
     "type": "word",
     "flagged": false

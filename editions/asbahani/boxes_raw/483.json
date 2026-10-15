@@ -93,7 +93,7 @@
     "x1": 984,
     "y1": 476,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 745,
@@ -101,7 +101,7 @@
     "x1": 869,
     "y1": 476,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 675,
@@ -141,7 +141,7 @@
     "x1": 545,
     "y1": 476,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 317,
@@ -165,7 +165,7 @@
     "x1": 272,
     "y1": 476,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 37,
@@ -245,7 +245,7 @@
     "x1": 1043,
     "y1": 691,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 671,
@@ -277,7 +277,7 @@
     "x1": 448,
     "y1": 691,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 91,
@@ -741,7 +741,7 @@
     "x1": 845,
     "y1": 1326,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 525,
@@ -749,7 +749,7 @@
     "x1": 704,
     "y1": 1326,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 478,
@@ -957,7 +957,7 @@
     "x1": 575,
     "y1": 1534,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 355,
@@ -989,7 +989,7 @@
     "x1": 195,
     "y1": 1534,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 982,
@@ -1045,7 +1045,7 @@
     "x1": 490,
     "y1": 1633,
     "type": "word",
-    "flagged": true
+    "flagged": false
   },
   {
     "x0": 190,
